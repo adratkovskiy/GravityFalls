@@ -44,4 +44,9 @@ pointXY Picture::getWidthHeight()
 	return { coordsFromAtlas_.w ,  coordsFromAtlas_.h };
 }
 
+void Picture::movePic()
+{
+	///Будем двигать кораблик
+}
+
 

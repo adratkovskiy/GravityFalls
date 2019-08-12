@@ -18,6 +18,7 @@ public:
 	SDL_Rect getCoordsOnWindow();
 	void setCoordsOnWindow(int coordX, int coordY);
 	pointXY getWidthHeight();
+	void movePic();
 private:
 	SDL_Rect coordsFromAtlas_;
 	SDL_Rect coordsOnWindow_;

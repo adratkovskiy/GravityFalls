@@ -68,7 +68,6 @@ int SDL_main(int argc, char* argv[])
 	ship->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
 	tmpCoords = { 1029, 0, 62, 62 };
 	Picture* targetToGo = new Picture(tmpCoords, backgroundAtlas, "targetToGo", aState);
-	//targetToGo->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
 	SDL_Event e;
 	SDL_Rect r;
 	int x = 0;
