@@ -95,7 +95,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Reecon\source\repos\GravityFalls\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -153,11 +153,13 @@
     <ClCompile Include="GravityFalls.cpp" />
     <ClCompile Include="Images.cpp" />
     <ClCompile Include="Picture.cpp" />
+    <ClCompile Include="ScreenText.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppState.h" />
     <ClInclude Include="Images.h" />
     <ClInclude Include="Picture.h" />
+    <ClInclude Include="ScreenText.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

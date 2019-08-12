@@ -1,17 +1,18 @@
 ﻿#include <iostream>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "Images.h"
 #include "AppState.h"
 #include "Picture.h"
+#include "ScreenText.h"
 
-const int SCREEN_WIDTH = 320;
-const int SCREEN_HEIGHT = 640;
+const int SCREEN_WIDTH = 1000;
+const int SCREEN_HEIGHT = 1000;
 const int TILE_SIZE = 64;
 const std::string DEF_IMG_FOLDER = "img/";
 
 SDL_Window* win = nullptr;
-SDL_Surface* scr = nullptr;
 SDL_Renderer* renderer = nullptr;
 
 int init() {
@@ -34,27 +35,27 @@ int init() {
 		return 1;
 	}
 
-	scr = SDL_GetWindowSurface(win);
+	if (TTF_Init() == -1)
+	{
+		std::cout << " Failed to initialize TTF : " << SDL_GetError() << std::endl;
+		return 1;
+	}
 
 	return 0;
 }
 
 
-int main(int argc, char** args) 
+int SDL_main(int argc, char* argv[])
 {
 	if (init() == 1) {
 		return 1;
 	}
 
+	ScreenText* simpleText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 0);
 	AppState* aState = new AppState();
-
 	Images* backgroundAtlas = new Images(DEF_IMG_FOLDER, "back.png", renderer);
 
-	SDL_Rect backgroundCoords;
-	backgroundCoords.x = 0;
-	backgroundCoords.y = 0;
-	backgroundCoords.w = 1000;
-	backgroundCoords.h = 1000;
+	SDL_Rect backgroundCoords = {0, 0, 1000, 1000};
 	Picture* background = new Picture(backgroundCoords, backgroundAtlas, "backgroundBottom", aState);
 	background->setCoordsOnWindow(0, SCREEN_HEIGHT - backgroundCoords.h);
 
@@ -83,8 +84,6 @@ int main(int argc, char** args)
 				{
 					if (aState->getEnableDrop()) {
 						std::cout << "drop: true" << std::endl;
-						//ballonCoords = ballon->getCoordsOnWindow();
-						//blockHouse.push_back(houseBoxes(defHouseCoords, elementsAtlas, "defHouse", gState, ballonCoords.x + ballonCoords.w / 2 - defHouseCoords.w / 2, ballonCoords.y + ballonCoords.h - 15, boxId++, 25));
 						aState->setEnableDrop(false);
 						std::cout << "drop: false" << std::endl;
 					}
@@ -98,37 +97,9 @@ int main(int argc, char** args)
 		SDL_RenderClear(renderer);
 
 		background->drawPic();
-		/*std::vector<Picture>::iterator backIter = backgroundBlueScreenVec.begin();
-		int backgroundBlueScreenNum = 0;
-		for (backIter = backgroundBlueScreenVec.begin(); backIter != backgroundBlueScreenVec.end(); ++backIter)
-		{
-			backIter->setCoordsOnWindow(0, SCREEN_HEIGHT - backgroundBottomCoords.h - backgroundBlueScreenCoords.h - backgroundBlueScreenCoords.h * backgroundBlueScreenNum);
-			backIter->drawPic();
-			backgroundBlueScreenNum++;
-		}
-		if (backgroundBlueScreenCoords.h * backgroundBlueScreenNum < gState->getScreenScroll()) {
-			backgroundBlueScreenVec.push_back(Picture(backgroundBlueScreenCoords, backgroundAtlas, "backgroundBlueScreen", gState));
-			std::cout << "add new blueScreen " << backgroundBlueScreenNum << std::endl;
-		}
-		int topCoord = SCREEN_HEIGHT - backgroundBottomCoords.h - backgroundBlueScreenCoords.h - backgroundBlueScreenCoords.h;
-		if (topCoord + gState->getScreenScroll() > 0) {
-			topCoord = 0 - gState->getScreenScroll();
-		}
-		backgroundTop->setCoordsOnWindow(0, topCoord);
-		backgroundTop->drawPic();
-
-		for (picIter = blockHouse.begin(); picIter != blockHouse.end(); ++picIter)
-		{
-			picIter->drawDroppedPic(blockHouse, SCREEN_HEIGHT);
-		}
-		ballon->moveBallon();
-		if (gState->getEnableScreenMove()) {
-			gState->nextScreenScrollTik();
-		}*/
-
+		simpleText->drawText("eee");
 		SDL_RenderPresent(renderer);
 		aState->createApp();
-		//gState->moveTower();
 	}
 
 	return 0;
