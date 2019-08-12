@@ -7,6 +7,7 @@
 #include "Picture.h"
 #include "ScreenText.h"
 #include "WorkTimer.h"
+#include "structs.h"
 
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
@@ -65,6 +66,9 @@ int SDL_main(int argc, char* argv[])
 	tmpCoords = {1001, 0, 27, 86};
 	Picture * ship = new Picture(tmpCoords, backgroundAtlas, "ship", aState);
 	ship->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
+	tmpCoords = { 1029, 0, 62, 62 };
+	Picture* targetToGo = new Picture(tmpCoords, backgroundAtlas, "targetToGo", aState);
+	//targetToGo->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
 	SDL_Event e;
 	SDL_Rect r;
 	int x = 0;
@@ -88,13 +92,16 @@ int SDL_main(int argc, char* argv[])
 			case SDL_MOUSEBUTTONDOWN:
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
-					if (aState->getEnableDrop()) {
-						std::cout << "drop: true" << std::endl;
-						aState->setEnableDrop(false);
-						std::cout << "drop: false" << std::endl;
-					}
+					
 				}
+				break;
+			case SDL_MOUSEBUTTONUP:
+				if (e.button.button == SDL_BUTTON_LEFT)
+				{
+					pointXY point = targetToGo->getWidthHeight();
+					aState->setTarget(e.motion.x - point.x/2, e.motion.y - point.y / 2);
 
+				}
 				break;
 			}
 		}
@@ -103,7 +110,13 @@ int SDL_main(int argc, char* argv[])
 		SDL_RenderClear(renderer);
 
 		background->drawPic();
+		if (aState->toShipMove()) {
+			pointXY point = aState->getTarget();
+			targetToGo->setCoordsOnWindow(point.x, point.y);
+			targetToGo->drawPic();
+		}
 		ship->drawPic();
+
 		simpleText->drawText(std::string("X: ") + std::to_string(ship->getCoordsOnWindow().x) + std::string(" Y: ") + std::to_string(ship->getCoordsOnWindow().y));
 		sysTime->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		SDL_RenderPresent(renderer);

@@ -5,6 +5,7 @@
 
 #include "Images.h"
 #include "AppState.h"
+#include "structs.h"
 
 
 class Picture
@@ -16,6 +17,7 @@ public:
 	void drawPic(SDL_Rect boxTargetCoord, Images* boxTargetatlas);
 	SDL_Rect getCoordsOnWindow();
 	void setCoordsOnWindow(int coordX, int coordY);
+	pointXY getWidthHeight();
 private:
 	SDL_Rect coordsFromAtlas_;
 	SDL_Rect coordsOnWindow_;

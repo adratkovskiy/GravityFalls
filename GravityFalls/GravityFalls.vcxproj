@@ -161,6 +161,7 @@
     <ClInclude Include="Images.h" />
     <ClInclude Include="Picture.h" />
     <ClInclude Include="ScreenText.h" />
+    <ClInclude Include="structs.h" />
     <ClInclude Include="WorkTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

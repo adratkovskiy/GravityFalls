@@ -39,4 +39,9 @@ void Picture::setCoordsOnWindow(int coordX, int coordY)
 	coordsOnWindow_.y = coordY;
 }
 
+pointXY Picture::getWidthHeight()
+{
+	return { coordsFromAtlas_.w ,  coordsFromAtlas_.h };
+}
+
 

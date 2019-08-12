@@ -7,16 +7,6 @@ AppState::AppState()
 
 }
 
-bool AppState::getEnableDrop()
-{
-	return enableDrop_;
-}
-
-void AppState::setEnableDrop(bool enableDrop)
-{
-	enableDrop_ = enableDrop;
-}
-
 void AppState::setScreenScroll(int screenScroll)
 {
 	screenScrollTarget_ = screenScroll + 1;
@@ -53,8 +43,24 @@ void AppState::toScreenScroll()
 void AppState::createApp()
 {
 	if (appNotStarted_) {
-		setEnableDrop(true);
 		appNotStarted_ = false;
 		std::cout << "App started" << std::endl;
 	}
+}
+
+void AppState::setTarget(int x, int y)
+{
+	shipMove = true;
+	targetX_ = x;
+	targetY_ = y;
+}
+
+pointXY AppState::getTarget()
+{
+	return { targetX_, targetY_ };
+}
+
+bool AppState::toShipMove()
+{
+	return shipMove;
 }
