@@ -154,12 +154,14 @@
     <ClCompile Include="Images.cpp" />
     <ClCompile Include="Picture.cpp" />
     <ClCompile Include="ScreenText.cpp" />
+    <ClCompile Include="WorkTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AppState.h" />
     <ClInclude Include="Images.h" />
     <ClInclude Include="Picture.h" />
     <ClInclude Include="ScreenText.h" />
+    <ClInclude Include="WorkTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

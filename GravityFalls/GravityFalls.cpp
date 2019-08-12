@@ -6,9 +6,10 @@
 #include "AppState.h"
 #include "Picture.h"
 #include "ScreenText.h"
+#include "WorkTimer.h"
 
 const int SCREEN_WIDTH = 1000;
-const int SCREEN_HEIGHT = 1000;
+const int SCREEN_HEIGHT = 800;
 const int TILE_SIZE = 64;
 const std::string DEF_IMG_FOLDER = "img/";
 
@@ -47,18 +48,23 @@ int init() {
 
 int SDL_main(int argc, char* argv[])
 {
+	WorkTimer* timer = new WorkTimer();
 	if (init() == 1) {
 		return 1;
 	}
 
+
 	ScreenText* simpleText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 0);
+	ScreenText* sysTime = new ScreenText(12, { 255, 255, 255 }, renderer, SCREEN_WIDTH - 200, 0);
 	AppState* aState = new AppState();
 	Images* backgroundAtlas = new Images(DEF_IMG_FOLDER, "back.png", renderer);
 
-	SDL_Rect backgroundCoords = {0, 0, 1000, 1000};
-	Picture* background = new Picture(backgroundCoords, backgroundAtlas, "backgroundBottom", aState);
-	background->setCoordsOnWindow(0, SCREEN_HEIGHT - backgroundCoords.h);
-
+	SDL_Rect tmpCoords = {0, 0, 1000, 1000};
+	Picture* background = new Picture(tmpCoords, backgroundAtlas, "background", aState);
+	background->setCoordsOnWindow(0, SCREEN_HEIGHT - tmpCoords.h);
+	tmpCoords = {1001, 0, 27, 86};
+	Picture * ship = new Picture(tmpCoords, backgroundAtlas, "ship", aState);
+	ship->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
 	SDL_Event e;
 	SDL_Rect r;
 	int x = 0;
@@ -75,8 +81,8 @@ int SDL_main(int argc, char* argv[])
 			}
 			switch (e.type) {
 			case SDL_MOUSEMOTION:
-				e.motion.x; // Координаты мыши 
-				e.motion.y; // Координаты мыши 
+				e.motion.x; 
+				e.motion.y;
 				break;
 
 			case SDL_MOUSEBUTTONDOWN:
@@ -97,7 +103,9 @@ int SDL_main(int argc, char* argv[])
 		SDL_RenderClear(renderer);
 
 		background->drawPic();
-		simpleText->drawText("eee");
+		ship->drawPic();
+		simpleText->drawText(std::string("X: ") + std::to_string(ship->getCoordsOnWindow().x) + std::string(" Y: ") + std::to_string(ship->getCoordsOnWindow().y));
+		sysTime->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		SDL_RenderPresent(renderer);
 		aState->createApp();
 	}
