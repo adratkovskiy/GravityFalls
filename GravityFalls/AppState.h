@@ -1,20 +1,25 @@
 #pragma once
 #include <iostream>
 #include "structs.h"
+//#include "Picture.h"
 
 class AppState
 {
 public:
 	AppState();
-	void setScreenScroll(int screenScroll);
-	int getScreenScroll();
 	void nextScreenScrollTik();
-	bool getEnableScreenMove();
 	void toScreenScroll();
 	void createApp();
-	void setTarget(int x, int y);
+	
+	bool getShipMove();
 	pointXY getTarget();
-	bool toShipMove();
+	bool getEnableScreenMove();
+	int getScreenScroll();
+
+	void setScreenScroll(int screenScroll);
+	void setTarget(int x, int y);
+	void setShipMove(bool stat);
+	//void setTarget(Picture* target);
 
 private:
 	bool shipMove = false;
@@ -25,7 +30,8 @@ private:
 	int screenScrollStart_ = 0;
 	bool appNotStarted_ = true;
 	float towerAngle_ = 0.0f;
-	int targetX_;
-	int targetY_;
+	int targetX_ = 0;
+	int targetY_ = 0;
+	//Picture* target_ = nullptr;
 };
 

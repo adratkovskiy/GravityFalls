@@ -54,8 +54,8 @@ int SDL_main(int argc, char* argv[])
 		return 1;
 	}
 
-
-	ScreenText* simpleText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 0);
+	ScreenText* boatCoord = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 0);
+	ScreenText* cursorCoord = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 20);
 	ScreenText* sysTime = new ScreenText(12, { 255, 255, 255 }, renderer, SCREEN_WIDTH - 200, 0);
 	AppState* aState = new AppState();
 	Images* backgroundAtlas = new Images(DEF_IMG_FOLDER, "back.png", renderer);
@@ -64,8 +64,8 @@ int SDL_main(int argc, char* argv[])
 	Picture* background = new Picture(tmpCoords, backgroundAtlas, "background", aState);
 	background->setCoordsOnWindow(0, SCREEN_HEIGHT - tmpCoords.h);
 	tmpCoords = {1001, 0, 27, 86};
-	Picture * ship = new Picture(tmpCoords, backgroundAtlas, "ship", aState);
-	ship->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
+	Picture * boat = new Picture(tmpCoords, backgroundAtlas, "ship", aState);
+	boat->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
 	tmpCoords = { 1029, 0, 62, 62 };
 	Picture* targetToGo = new Picture(tmpCoords, backgroundAtlas, "targetToGo", aState);
 	SDL_Event e;
@@ -99,7 +99,6 @@ int SDL_main(int argc, char* argv[])
 				{
 					pointXY point = targetToGo->getWidthHeight();
 					aState->setTarget(e.motion.x - point.x/2, e.motion.y - point.y / 2);
-
 				}
 				break;
 			}
@@ -109,14 +108,20 @@ int SDL_main(int argc, char* argv[])
 		SDL_RenderClear(renderer);
 
 		background->drawPic();
-		if (aState->toShipMove()) {
-			pointXY point = aState->getTarget();
+		if (aState->getShipMove()) {
+
+			/*pointXY point = aState->getTarget();
 			targetToGo->setCoordsOnWindow(point.x, point.y);
 			targetToGo->drawPic();
+			pointXY boatCoord = boat->getSelfCenter();
+			if ((point.x == boatCoord.x) && (point.y == boatCoord.y)) {
+				aState->setShipMove(false);
+			}*/
 		}
-		ship->drawPic();
+		boat->drawPic();
 
-		simpleText->drawText(std::string("X: ") + std::to_string(ship->getCoordsOnWindow().x) + std::string(" Y: ") + std::to_string(ship->getCoordsOnWindow().y));
+		boatCoord->drawText(std::string("Boat X:") + std::to_string(boat->getCoordsOnWindow().x) + std::string(" Y:") + std::to_string(boat->getCoordsOnWindow().y));
+		cursorCoord->drawText(std::string("Cursor X:") + std::to_string(e.motion.x) + std::string(" Y:") + std::to_string(e.motion.y));
 		sysTime->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		SDL_RenderPresent(renderer);
 		aState->createApp();

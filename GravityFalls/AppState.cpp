@@ -60,7 +60,17 @@ pointXY AppState::getTarget()
 	return { targetX_, targetY_ };
 }
 
-bool AppState::toShipMove()
+bool AppState::getShipMove()
 {
 	return shipMove;
 }
+
+void AppState::setShipMove(bool stat)
+{
+	shipMove = stat;
+}
+
+/*void AppState::setTarget(Picture* target)
+{
+	target_ = target;
+}*/

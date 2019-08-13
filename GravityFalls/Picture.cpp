@@ -33,6 +33,12 @@ SDL_Rect Picture::getCoordsOnWindow()
 	return coordsOnWindow_;
 }
 
+pointXY Picture::getSelfCenter()
+{
+	SDL_Rect coordRect = getCoordsOnWindow();
+	return pointXY({coordRect.x + coordRect.w/2, coordRect.y + coordRect.h / 2 });
+}
+
 void Picture::setCoordsOnWindow(int coordX, int coordY)
 {
 	coordsOnWindow_.x = coordX;
@@ -46,7 +52,27 @@ pointXY Picture::getWidthHeight()
 
 void Picture::movePic()
 {
-	///Будем двигать кораблик
+	std::cout << "move" << std::endl;
+	pointXY c;
+	pointXY b = aState_->getTarget();
+	pointXY selfCoord = getSelfCenter();
+	c.x = b.x - selfCoord.x;
+	c.y = b.y - selfCoord.y;
+	pointXY diff = normalize(c);
+	setCoordsOnWindow(diff.x * 2, diff.y * 2);
 }
 
+pointXY Picture::normalize(pointXY coords)
+{
+	float len = vecLen(coords);
+	pointXY b;
+	b.x = coords.x / len;
+	b.y = coords.y / len;
+	return b;
+}
+
+float Picture::vecLen(pointXY a)
+{
+	return sqrt(a.x * a.x + a.y * a.y);
+}
 
