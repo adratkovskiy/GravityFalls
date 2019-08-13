@@ -6,7 +6,7 @@
 class AppState
 {
 public:
-	AppState();
+	AppState(float moveSpeed);
 	void nextScreenScrollTik();
 	void toScreenScroll();
 	void createApp();
@@ -15,6 +15,7 @@ public:
 	pointXY getTarget();
 	bool getEnableScreenMove();
 	int getScreenScroll();
+	float getMoveSpeed();
 
 	void setScreenScroll(int screenScroll);
 	void setTarget(int x, int y);
@@ -32,6 +33,7 @@ private:
 	float towerAngle_ = 0.0f;
 	int targetX_ = 0;
 	int targetY_ = 0;
-	//Picture* target_ = nullptr;
+	float moveSpeed_;
+	//Picture* picTarget_;
 };
 

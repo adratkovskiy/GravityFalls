@@ -58,17 +58,20 @@ void Picture::movePic()
 	pointXY selfCoord = getSelfCenter();
 	c.x = b.x - selfCoord.x;
 	c.y = b.y - selfCoord.y;
-	pointXY diff = normalize(c);
-	setCoordsOnWindow(diff.x * 2, diff.y * 2);
+	pointXYFloat diff = normalize(c);
+	diff.x *= aState_->getMoveSpeed();
+	diff.y *= aState_->getMoveSpeed();
+	std::cout << "diff x:" << diff.x << " y:" << diff.y << std::endl;
+	setCoordsOnWindow(selfCoord.x - coordsOnWindow_.w / 2 + diff.x, selfCoord.y - coordsOnWindow_.h / 2 + diff.y);
 }
 
-pointXY Picture::normalize(pointXY coords)
+pointXYFloat Picture::normalize(pointXY coords)
 {
 	float len = vecLen(coords);
-	pointXY b;
+	pointXYFloat b;
 	b.x = coords.x / len;
 	b.y = coords.y / len;
-	return b;
+	return {b.x, b.y};
 }
 
 float Picture::vecLen(pointXY a)

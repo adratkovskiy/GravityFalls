@@ -21,12 +21,13 @@ public:
 	void setCoordsOnWindow(int coordX, int coordY);
 	pointXY getWidthHeight();
 	void movePic();
-	pointXY normalize(pointXY coords);
+	pointXYFloat normalize(pointXY coords);
 private:
 	SDL_Rect coordsFromAtlas_;
 	SDL_Rect coordsOnWindow_;
 	Images* atlas_;
 	int scrollScreen_ = 0;
 	AppState* aState_ = nullptr;
+	//float moveSpeed_ = 4;
 };
 

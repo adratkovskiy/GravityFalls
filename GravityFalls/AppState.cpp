@@ -2,9 +2,9 @@
 
 #include "AppState.h"
 
-AppState::AppState()
+AppState::AppState(float moveSpeed)
 {
-
+	moveSpeed_ = moveSpeed;
 }
 
 void AppState::setScreenScroll(int screenScroll)
@@ -18,6 +18,11 @@ void AppState::setScreenScroll(int screenScroll)
 int AppState::getScreenScroll()
 {
 	return screenScroll_;
+}
+
+float AppState::getMoveSpeed()
+{
+	return moveSpeed_;
 }
 
 void AppState::nextScreenScrollTik()
