@@ -52,24 +52,24 @@ pointXY Picture::getWidthHeight()
 
 void Picture::movePic()
 {
-	//std::cout << "move" << std::endl;
+	int moveSpeed = aState_->getMoveSpeed();
 	pointXY c;
 	pointXY b = aState_->getTarget();
 	pointXY selfCoord = getSelfCenter();
 	c.x = b.x - selfCoord.x;
 	c.y = b.y - selfCoord.y;
 	pointXYFloat diff = normalize(c);
-
-	diff.x *= aState_->getMoveSpeed();
-	diff.y *= aState_->getMoveSpeed();
-	if (abs(selfCoord.x - coordsOnWindow_.w / 2 + diff.x) + abs(selfCoord.y - coordsOnWindow_.h / 2 + diff.y) > (abs(b.x) + abs(b.y)) )
+	diff.x *= moveSpeed;
+	diff.y *= moveSpeed;
+	if (abs(b.x - selfCoord.x) + abs(b.y - selfCoord.y) <= moveSpeed)
 	{
-		
+		setCoordsOnWindow((selfCoord.x - coordsOnWindow_.w / 2 + diff.x), (selfCoord.y - coordsOnWindow_.h / 2 + diff.y));
+		aState_->setShipMove(false);
 	}
-	std::cout << "1: " << abs(selfCoord.x - coordsOnWindow_.w / 2 + diff.x) + abs(selfCoord.y - coordsOnWindow_.h / 2 + diff.y) << " diff:" << diff.x + diff.y << std::endl;
-	std::cout << "2: " << abs(b.x) + abs(b.y) << std::endl;
-	//std::cout << "diff x:" << diff.x << " y:" << diff.y << std::endl;
-	setCoordsOnWindow(selfCoord.x - coordsOnWindow_.w / 2 + diff.x, selfCoord.y - coordsOnWindow_.h / 2 + diff.y);
+	else {
+		setCoordsOnWindow(selfCoord.x - coordsOnWindow_.w / 2 + diff.x, selfCoord.y - coordsOnWindow_.h / 2 + diff.y);
+	}
+	
 }
 
 pointXYFloat Picture::normalize(pointXY coords)
