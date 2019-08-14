@@ -14,7 +14,12 @@ Picture::Picture(SDL_Rect coordsFromAtlas, Images* atlas, std::string picname, A
 
 void Picture::drawPic()
 {
-	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x, coordsOnWindow_.y + aState_->getScreenScroll());
+	if (getAngle() == 0.0f) {
+		atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x, coordsOnWindow_.y + aState_->getScreenScroll());
+	}
+	else {
+		drawPic(getAngle());
+	}
 }
 
 void Picture::drawPic(double angle)
@@ -39,10 +44,20 @@ pointXY Picture::getSelfCenter()
 	return pointXY({coordRect.x + coordRect.w/2, coordRect.y + coordRect.h / 2 });
 }
 
+double Picture::getAngle()
+{
+	return angle_;
+}
+
 void Picture::setCoordsOnWindow(int coordX, int coordY)
 {
 	coordsOnWindow_.x = coordX;
 	coordsOnWindow_.y = coordY;
+}
+
+void Picture::setAngle(double angle)
+{
+	angle_ = angle;
 }
 
 pointXY Picture::getWidthHeight()
@@ -53,20 +68,34 @@ pointXY Picture::getWidthHeight()
 void Picture::movePic()
 {
 	int moveSpeed = aState_->getMoveSpeed();
-	pointXY c;
-	pointXY b = aState_->getTarget();
-	pointXY selfCoord = getSelfCenter();
-	c.x = b.x - selfCoord.x;
-	c.y = b.y - selfCoord.y;
-	pointXYFloat diff = normalize(c);
+	pointXY moveVector;
+	pointXY targetCoord = aState_->getTarget();
+	pointXYFloat selfCoord;
+	if ((coordsFloat_.x == 0.0f) && (coordsFloat_.y == 0.0f)) {
+		selfCoord.x = getSelfCenter().x;
+		selfCoord.y = getSelfCenter().y;
+	}
+	else
+	{
+		selfCoord = coordsFloat_;
+	}
+	moveVector.x = targetCoord.x - selfCoord.x;
+	moveVector.y = targetCoord.y - selfCoord.y;
+	pointXYFloat diff = normalize(moveVector);
+	pointXYFloat defVec = normalize({ 0, 1 });
+	float angle = acos(diff.x * defVec.x + diff.y * defVec.y) * 180 / PI + 180;
+	setAngle(angle);
+	std::cout << angle << std::endl;
 	diff.x *= moveSpeed;
 	diff.y *= moveSpeed;
-	if (abs(b.x - selfCoord.x) + abs(b.y - selfCoord.y) <= moveSpeed)
+	if (abs(targetCoord.x - selfCoord.x) + abs(targetCoord.y - selfCoord.y) <= moveSpeed)
 	{
-		setCoordsOnWindow((selfCoord.x - coordsOnWindow_.w / 2 + diff.x), (selfCoord.y - coordsOnWindow_.h / 2 + diff.y));
+		setCoordsOnWindow((targetCoord.x - coordsOnWindow_.w / 2), (targetCoord.y - coordsOnWindow_.h / 2 ));
 		aState_->setShipMove(false);
 	}
 	else {
+		coordsFloat_.x = selfCoord.x + diff.x;
+		coordsFloat_.y = selfCoord.y + diff.y;
 		setCoordsOnWindow(selfCoord.x - coordsOnWindow_.w / 2 + diff.x, selfCoord.y - coordsOnWindow_.h / 2 + diff.y);
 	}
 	
