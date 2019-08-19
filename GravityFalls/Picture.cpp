@@ -14,11 +14,12 @@ Picture::Picture(SDL_Rect coordsFromAtlas, Images* atlas, std::string picname, A
 
 void Picture::drawPic()
 {
-	if (getAngle() == 0.0f) {
-		atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x, coordsOnWindow_.y + aState_->getScreenScroll());
+	
+	if (getAngle() != NULL) {
+		drawPic(getAngle());
 	}
 	else {
-		drawPic(getAngle());
+		atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x, coordsOnWindow_.y + aState_->getScreenScroll());
 	}
 }
 
@@ -81,11 +82,27 @@ void Picture::movePic()
 	}
 	moveVector.x = targetCoord.x - selfCoord.x;
 	moveVector.y = targetCoord.y - selfCoord.y;
-	pointXYFloat diff = normalize(moveVector);
+	pointXYFloat diff;
+	if ((moveVector.x == 0) && (moveVector.y == 0)) {
+		
+	}
+	else {
+		diff = normalize(moveVector);
+	}
 	pointXYFloat defVec = normalize({ 0, 1 });
-	float angle = acos(diff.x * defVec.x + diff.y * defVec.y) * 180 / PI + 180;
+	float angle;
+	if (diff.x == 0) {
+		angle = 270;
+	}
+	
+	if (diff.x < 0) {
+		angle = acos(diff.x * defVec.x + diff.y * defVec.y) * 180 / PI + 180;
+	}
+	else {
+		angle = acos(diff.x * defVec.x + diff.y * defVec.y) * (-180) / PI + 180;
+	}
 	setAngle(angle);
-	std::cout << angle << std::endl;
+
 	diff.x *= moveSpeed;
 	diff.y *= moveSpeed;
 	if (abs(targetCoord.x - selfCoord.x) + abs(targetCoord.y - selfCoord.y) <= moveSpeed)
@@ -112,6 +129,7 @@ pointXYFloat Picture::normalize(pointXY coords)
 
 float Picture::vecLen(pointXY a)
 {
+	std::cout << a.x << " " << a.y << std::endl;
 	return sqrt(a.x * a.x + a.y * a.y);
 }
 
