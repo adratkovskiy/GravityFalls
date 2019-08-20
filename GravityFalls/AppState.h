@@ -10,30 +10,31 @@ public:
 	void nextScreenScrollTik();
 	void toScreenScroll();
 	void createApp();
-	
 	bool getShipMove();
 	pointXY getTarget();
 	bool getEnableScreenMove();
-	int getScreenScroll();
 	float getMoveSpeed();
+	pointXY getScreenScroll();
+	bool getScreenScrollActive();
+	pointXY getScreenScrollStart();
 
-	void setScreenScroll(int screenScroll);
 	void setTarget(int x, int y);
 	void setShipMove(bool stat);
-	//void setTarget(Picture* target);
+	void setScreenScroll(pointXY screenScroll);
+	void setScreenScrollActive(bool screenScrollActive);
+	void setScreenScrollStart(pointXY screenScrollStart);
 
 private:
-	bool shipMove = false;
-	int screenScroll_ = 0;
+	bool shipMove_ = false;
 	float screenAngleTik_ = 0.0f;
 	bool enableScreenMove_ = false;
-	int screenScrollTarget_ = 0;
-	int screenScrollStart_ = 0;
 	bool appNotStarted_ = true;
 	float towerAngle_ = 0.0f;
 	int targetX_ = 0;
 	int targetY_ = 0;
 	float moveSpeed_;
-	//Picture* picTarget_;
+	bool screenScrollActive_ = false;
+	pointXY screenScroll_ = { 0,0 };
+	pointXY screenScrollStart_ = { 0,0 };
 };
 

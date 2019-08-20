@@ -79,6 +79,7 @@ int SDL_main(int argc, char* argv[])
 	bool run = true;
 
 	while (run) {
+		pointXY screenScroll = aState->getScreenScroll();
 		while (SDL_PollEvent(&e) != NULL) {
 			if (e.type == SDL_QUIT) {
 				run = false;
@@ -92,16 +93,24 @@ int SDL_main(int argc, char* argv[])
 			case SDL_MOUSEBUTTONDOWN:
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
-					
+					aState->setScreenScrollStart({ e.motion.x - screenScroll.x, e.motion.y - screenScroll.y });
+					//aState->setScreenScrollActive(true);
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
-					aState->setTarget(e.motion.x, e.motion.y);
+					//if (((e.motion.x - aState->getScreenScrollStart().x) == 0) && ((e.motion.y - aState->getScreenScrollStart().y) == 0)) {
+						aState->setTarget(e.motion.x - screenScroll.x, e.motion.y - screenScroll.y);
+					//}
+					std::cout << (aState->getScreenScrollStart().x) << " " << (e.motion.x - screenScroll.x) << std::endl;
+					aState->setScreenScrollActive(false);
 				}
 				break;
 			}
+		}
+		if (aState->getScreenScrollActive()) {
+			aState->setScreenScroll({ e.motion.x - aState->getScreenScrollStart().x, e.motion.y - aState->getScreenScrollStart().y });
 		}
 		r.x = x;
 		r.y = y;
@@ -125,7 +134,8 @@ int SDL_main(int argc, char* argv[])
 		boat->drawPic();
 
 		boatCoord->drawText(std::string("Boat X:") + std::to_string(boat->getSelfCenter().x) + std::string(" Y:") + std::to_string(boat->getSelfCenter().y));
-		cursorCoord->drawText(std::string("Cursor X:") + std::to_string(e.motion.x) + std::string(" Y:") + std::to_string(e.motion.y));
+		//cursorCoord->drawText(std::string("Cursor X:") + std::to_string(e.motion.x) + std::string(" Y:") + std::to_string(e.motion.y));
+		cursorCoord->drawText(std::string("Cursor X:") + std::to_string(aState->getScreenScrollStart().x) + std::string(" Y:") + std::to_string(e.motion.y));
 		sysTime->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		SDL_RenderPresent(renderer);
 		aState->createApp();

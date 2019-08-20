@@ -19,19 +19,19 @@ void Picture::drawPic()
 		drawPic(getAngle());
 	}
 	else {
-		atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x, coordsOnWindow_.y + aState_->getScreenScroll());
+		atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x + aState_->getScreenScroll().x, coordsOnWindow_.y + aState_->getScreenScroll().y);
 	}
 }
 
 void Picture::drawPic(double angle)
 {
-	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x, coordsOnWindow_.y + aState_->getScreenScroll(), angle);
+	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x + aState_->getScreenScroll().x, coordsOnWindow_.y + aState_->getScreenScroll().y, angle);
 }
 
 void Picture::drawPic(SDL_Rect boxTargetCoord, Images* boxTargetatlas)
 {
-	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x, coordsOnWindow_.y + aState_->getScreenScroll());
-	boxTargetatlas->renderTexture(boxTargetCoord, coordsOnWindow_.x + coordsOnWindow_.w / 2 - boxTargetCoord.w / 2, coordsOnWindow_.y + coordsOnWindow_.h - 15 + aState_->getScreenScroll());
+	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x + aState_->getScreenScroll().x, coordsOnWindow_.y + aState_->getScreenScroll().y);
+	boxTargetatlas->renderTexture(boxTargetCoord, coordsOnWindow_.x + coordsOnWindow_.w / 2 - boxTargetCoord.w / 2 + aState_->getScreenScroll().x, coordsOnWindow_.y + coordsOnWindow_.h - 15 + aState_->getScreenScroll().y);
 }
 
 SDL_Rect Picture::getCoordsOnWindow()

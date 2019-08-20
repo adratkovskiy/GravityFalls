@@ -7,22 +7,25 @@ AppState::AppState(float moveSpeed)
 	moveSpeed_ = moveSpeed;
 }
 
-void AppState::setScreenScroll(int screenScroll)
-{
-	screenScrollTarget_ = screenScroll + 1;
-	screenScrollStart_ = screenScroll_;
-	std::cout << "scroll: " << screenScrollTarget_ << std::endl;
-	enableScreenMove_ = true;
-}
-
-int AppState::getScreenScroll()
-{
-	return screenScroll_;
-}
 
 float AppState::getMoveSpeed()
 {
 	return moveSpeed_;
+}
+
+pointXY AppState::getScreenScroll()
+{
+	return screenScroll_;
+}
+
+bool AppState::getScreenScrollActive()
+{
+	return screenScrollActive_;
+}
+
+pointXY AppState::getScreenScrollStart()
+{
+	return screenScrollStart_;
 }
 
 void AppState::nextScreenScrollTik()
@@ -38,11 +41,11 @@ bool AppState::getEnableScreenMove()
 
 void AppState::toScreenScroll()
 {
-	screenScroll_ = screenScrollStart_ + (screenScrollTarget_ - screenScrollStart_) * sin(screenAngleTik_);
+	/*screenScroll_ = screenScrollStart_ + (screenScrollTarget_ - screenScrollStart_) * sin(screenAngleTik_);
 	if (screenScroll_ >= screenScrollTarget_ - 1) {
 		enableScreenMove_ = false;
 		screenAngleTik_ = 0;
-	}
+	}*/
 }
 
 void AppState::createApp()
@@ -55,7 +58,7 @@ void AppState::createApp()
 
 void AppState::setTarget(int x, int y)
 {
-	shipMove = true;
+	shipMove_ = true;
 	targetX_ = x;
 	targetY_ = y;
 }
@@ -67,12 +70,28 @@ pointXY AppState::getTarget()
 
 bool AppState::getShipMove()
 {
-	return shipMove;
+	return shipMove_;
 }
 
 void AppState::setShipMove(bool stat)
 {
-	shipMove = stat;
+	shipMove_ = stat;
+}
+
+void AppState::setScreenScroll(pointXY screenScroll)
+{
+	screenScroll_ = screenScroll;
+}
+
+void AppState::setScreenScrollActive(bool screenScrollActive)
+{
+	screenScrollActive_ = screenScrollActive;
+}
+
+void AppState::setScreenScrollStart(pointXY screenScrollStart)
+{
+	screenScrollStart_ = screenScrollStart;
+	screenScrollActive_ = true;
 }
 
 /*void AppState::setTarget(Picture* target)
