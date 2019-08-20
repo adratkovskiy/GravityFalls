@@ -68,8 +68,8 @@ pointXY Picture::getWidthHeight()
 
 void Picture::movePic()
 {
-	int moveSpeed = aState_->getMoveSpeed();
-	pointXY moveVector;
+	float moveSpeed = aState_->getMoveSpeed();
+	pointXYFloat moveVector;
 	pointXY targetCoord = aState_->getTarget();
 	pointXYFloat selfCoord;
 	if ((coordsFloat_.x == 0.0f) && (coordsFloat_.y == 0.0f)) {
@@ -83,26 +83,24 @@ void Picture::movePic()
 	moveVector.x = targetCoord.x - selfCoord.x;
 	moveVector.y = targetCoord.y - selfCoord.y;
 	pointXYFloat diff;
-	if ((moveVector.x == 0) && (moveVector.y == 0)) {
-		
-	}
-	else {
-		diff = normalize(moveVector);
-	}
+	diff = normalize(moveVector);
 	pointXYFloat defVec = normalize({ 0, 1 });
-	float angle;
+	double angle;
 	if (diff.x == 0) {
 		angle = 270;
 	}
-	
 	if (diff.x < 0) {
 		angle = acos(diff.x * defVec.x + diff.y * defVec.y) * 180 / PI + 180;
 	}
 	else {
 		angle = acos(diff.x * defVec.x + diff.y * defVec.y) * (-180) / PI + 180;
 	}
-	setAngle(angle);
-
+	if ((moveVector.x == 0) && (moveVector.y == 0)) {
+		
+	}
+	else {
+		setAngle(angle);
+	}
 	diff.x *= moveSpeed;
 	diff.y *= moveSpeed;
 	if (abs(targetCoord.x - selfCoord.x) + abs(targetCoord.y - selfCoord.y) <= moveSpeed)
@@ -118,7 +116,7 @@ void Picture::movePic()
 	
 }
 
-pointXYFloat Picture::normalize(pointXY coords)
+pointXYFloat Picture::normalize(pointXYFloat coords)
 {
 	float len = vecLen(coords);
 	pointXYFloat b;
@@ -127,9 +125,8 @@ pointXYFloat Picture::normalize(pointXY coords)
 	return {b.x, b.y};
 }
 
-float Picture::vecLen(pointXY a)
+float Picture::vecLen(pointXYFloat a)
 {
-	std::cout << a.x << " " << a.y << std::endl;
 	return sqrt(a.x * a.x + a.y * a.y);
 }
 

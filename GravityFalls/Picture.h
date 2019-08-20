@@ -16,9 +16,9 @@ public:
 	void drawPic();
 	void drawPic(double angle);
 	void drawPic(SDL_Rect boxTargetCoord, Images* boxTargetatlas);
-	float Picture::vecLen(pointXY a);
+	float Picture::vecLen(pointXYFloat a);
 	void movePic();
-	pointXYFloat normalize(pointXY coords);
+	pointXYFloat normalize(pointXYFloat coords);
 
 	pointXY getWidthHeight();
 	SDL_Rect getCoordsOnWindow();
