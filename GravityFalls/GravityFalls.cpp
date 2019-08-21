@@ -13,6 +13,10 @@ const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 const float MOVE_SPEED = 2;
 const int TILE_SIZE = 1000;
+const long double DEF_LAT_Y = 57.1466547; //68°57.1466547
+const long double DEF_LNG_X = 02.0312438; //33°02.0312438
+const long double PX_TO_LAT_Y = -0.000013311634;
+const long double PX_TO_LNG_X = 0.000037065027;
 const std::string DEF_IMG_FOLDER = "img/";
 
 SDL_Window* win = nullptr;
@@ -56,8 +60,10 @@ int SDL_main(int argc, char* argv[])
 	}
 
 	ScreenText* boatCoordText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 0);
-	ScreenText* cursorCoordText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 20);
-	ScreenText* screenScrollText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 40);
+	ScreenText* boatCoordGPSText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 20);
+	ScreenText* cursorCoordText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 40);
+	ScreenText* cursorCoordGPSText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 60);
+	ScreenText* screenScrollText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 80);
 	ScreenText* sysTimeText = new ScreenText(12, { 255, 255, 255 }, renderer, SCREEN_WIDTH - 200, 0);
 	AppState* aState = new AppState(MOVE_SPEED);
 	Images* backgroundAtlas = new Images(DEF_IMG_FOLDER, "back.png", renderer);
@@ -156,7 +162,9 @@ int SDL_main(int argc, char* argv[])
 		}
 		boat->drawPic();
 		boatCoordText->drawText(std::string("Boat X:") + std::to_string(boat->getSelfCenter().x) + std::string(" Y:") + std::to_string(boat->getSelfCenter().y));
-		cursorCoordText->drawText(std::string("Cursor X:") + std::to_string(aState->getScreenScrollStart().x) + std::string(" Y:") + std::to_string(e.motion.y));
+		boatCoordGPSText->drawText(std::string("Boat LNG: 33°") + std::to_string(boat->getSelfCenter().x * PX_TO_LNG_X + DEF_LNG_X) + std::string(" LAT: 68°") + std::to_string(boat->getSelfCenter().y * PX_TO_LAT_Y + DEF_LAT_Y));
+		cursorCoordText->drawText(std::string("Cursor X:") + std::to_string(e.motion.x) + std::string(" Y:") + std::to_string(e.motion.y));
+		cursorCoordGPSText->drawText(std::string("Cursor LNG: 33°:") + std::to_string((e.motion.x - screenScroll.x) * PX_TO_LNG_X + DEF_LNG_X) + std::string(" LAT: 68°") + std::to_string((e.motion.y - screenScroll.y) * PX_TO_LAT_Y + DEF_LAT_Y));
 		screenScrollText->drawText(std::string("Screen Scroll X:") + std::to_string(screenScroll.x) + std::string(" Y:") + std::to_string(screenScroll.y));
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		SDL_RenderPresent(renderer);
@@ -167,6 +175,10 @@ int SDL_main(int argc, char* argv[])
 }
 
 /*
+100px = 2м
+boat = 86px = 1.72m
+68_57.1466547 - 68_56.1466547 = 1.85325133km
+69_57.1466547 - 68_57.1466547 = 111.19507973km
 Lat: 6857.1466547 Long: 03302.0312438 Alt: 17.2617
 Lat: 6857.1466535 Long: 03302.0312387 Alt: 17.2613
 Lat: 6857.1466535 Long: 03302.0312392 Alt: 17.2566
