@@ -77,6 +77,7 @@ int SDL_main(int argc, char* argv[])
 	r.y = y;
 
 	bool run = true;
+	pointXY screenScrollOld;
 
 	while (run) {
 		pointXY screenScroll = aState->getScreenScroll();
@@ -94,16 +95,15 @@ int SDL_main(int argc, char* argv[])
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
 					aState->setScreenScrollStart({ e.motion.x - screenScroll.x, e.motion.y - screenScroll.y });
-					//aState->setScreenScrollActive(true);
+					screenScrollOld = { screenScroll.x , screenScroll.y };
 				}
 				break;
 			case SDL_MOUSEBUTTONUP:
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
-					//if (((e.motion.x - aState->getScreenScrollStart().x) == 0) && ((e.motion.y - aState->getScreenScrollStart().y) == 0)) {
+					if ((screenScrollOld.x == screenScroll.x) && (screenScrollOld.y == screenScroll.y)) {
 						aState->setTarget(e.motion.x - screenScroll.x, e.motion.y - screenScroll.y);
-					//}
-					std::cout << (aState->getScreenScrollStart().x) << " " << (e.motion.x - screenScroll.x) << std::endl;
+					}
 					aState->setScreenScrollActive(false);
 				}
 				break;
