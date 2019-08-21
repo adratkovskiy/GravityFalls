@@ -28,6 +28,11 @@ void Picture::drawPic(double angle)
 	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x + aState_->getScreenScroll().x, coordsOnWindow_.y + aState_->getScreenScroll().y, angle);
 }
 
+void Picture::drawPic(pointXY pointOfDraw)
+{
+	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x + aState_->getScreenScroll().x + pointOfDraw.x, coordsOnWindow_.y + aState_->getScreenScroll().y + pointOfDraw.y);
+}
+
 void Picture::drawPic(SDL_Rect boxTargetCoord, Images* boxTargetatlas)
 {
 	atlas_->renderTexture(coordsFromAtlas_, coordsOnWindow_.x + aState_->getScreenScroll().x, coordsOnWindow_.y + aState_->getScreenScroll().y);

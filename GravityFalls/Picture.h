@@ -15,6 +15,7 @@ public:
 	Picture(SDL_Rect coordsFromAtlas, Images* atlas, std::string picname, AppState* aState);
 	void drawPic();
 	void drawPic(double angle);
+	void drawPic(pointXY pointOfDraw);
 	void drawPic(SDL_Rect boxTargetCoord, Images* boxTargetatlas);
 	float Picture::vecLen(pointXYFloat a);
 	void movePic();
