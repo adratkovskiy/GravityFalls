@@ -95,7 +95,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\Reecon\source\repos\GravityFalls\lib\x86;C:\Users\reeco\Documents\GravityFalls\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -149,18 +149,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Address.cpp" />
     <ClCompile Include="AppState.cpp" />
     <ClCompile Include="GravityFalls.cpp" />
     <ClCompile Include="Images.cpp" />
     <ClCompile Include="Picture.cpp" />
     <ClCompile Include="ScreenText.cpp" />
+    <ClCompile Include="Socket.cpp" />
     <ClCompile Include="WorkTimer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Address.h" />
     <ClInclude Include="AppState.h" />
     <ClInclude Include="Images.h" />
     <ClInclude Include="Picture.h" />
     <ClInclude Include="ScreenText.h" />
+    <ClInclude Include="Socket.h" />
     <ClInclude Include="structs.h" />
     <ClInclude Include="WorkTimer.h" />
   </ItemGroup>

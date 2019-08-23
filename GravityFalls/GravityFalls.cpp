@@ -2,12 +2,20 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
+#include <winsock2.h>
+#include <assert.h>
+
 #include "Images.h"
 #include "AppState.h"
 #include "Picture.h"
 #include "ScreenText.h"
 #include "WorkTimer.h"
 #include "structs.h"
+#include "Socket.h"
+#include "Address.h"
+
+#pragma comment( lib, "ws2_32.lib" )
+
 
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
@@ -51,9 +59,41 @@ if (TTF_Init() == -1)
 return 0;
 }
 
+void wait_seconds(float seconds)
+{
+	Sleep((int)(seconds * 1000.0f));
+}
+
+inline bool InitializeSockets()
+{
+	WSADATA WsaData;
+	return WSAStartup(MAKEWORD(2, 2), &WsaData) == NO_ERROR;
+}
+
+inline void ShutdownSockets()
+{
+	WSACleanup();
+}
+
+using namespace std;
 
 int SDL_main(int argc, char* argv[])
 {
+	if (!InitializeSockets())
+	{
+		printf("failed to initialize sockets\n");
+		return 1;
+	}
+
+	int port = 8012;
+	printf("creating socket on port %d\n", port);
+	Socket socket;
+	if (!socket.Open(port))
+	{
+		printf("failed to create socket!\n");
+		return 1;
+	}
+	
 	WorkTimer* timer = new WorkTimer();
 	if (init() == 1) {
 		return 1;
@@ -169,48 +209,18 @@ int SDL_main(int argc, char* argv[])
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		SDL_RenderPresent(renderer);
 		aState->createApp();
+		
+		while (true)
+		{
+			Address sender;
+			unsigned char buffer[256];
+			int bytes_read = socket.Receive(sender, buffer, sizeof(buffer));
+			if (!bytes_read)
+				break;
+			//printf("received packet from %d.%d.%d.%d:%d (%d bytes)\n", sender.GetA(), sender.GetB(), sender.GetC(), sender.GetD(), sender.GetPort(), bytes_read);
+			cout << buffer << endl;
+		}
 	}
-
+	//closesocket(socket);
 	return 0;
 }
-
-/*
-100px = 2м
-boat = 86px = 1.72m
-68_57.1466547 - 68_56.1466547 = 1.85325133km
-69_57.1466547 - 68_57.1466547 = 111.19507973km
-Lat: 6857.1466547 Long: 03302.0312438 Alt: 17.2617
-Lat: 6857.1466535 Long: 03302.0312387 Alt: 17.2613
-Lat: 6857.1466535 Long: 03302.0312392 Alt: 17.2566
-Lat: 6857.1466535 Long: 03302.0312392 Alt: 17.2566
-Lat: 6857.1466540 Long: 03302.0312339 Alt: 17.2593
-Lat: 6857.1466540 Long: 03302.0312339 Alt: 17.2593
-Lat: 6857.1466542 Long: 03302.0312282 Alt: 17.2614
-Lat: 6857.1466542 Long: 03302.0312282 Alt: 17.2614
-Lat: 6857.1466550 Long: 03302.0312277 Alt: 17.2673
-Lat: 6857.1466561 Long: 03302.0312265 Alt: 17.2599
-Lat: 6857.1466561 Long: 03302.0312265 Alt: 17.2599
-Lat: 6857.1466565 Long: 03302.0312253 Alt: 17.2624
-Lat: 6857.1466572 Long: 03302.0312222 Alt: 17.2566
-Lat: 6857.1466572 Long: 03302.0312222 Alt: 17.2566
-Lat: 6857.1466560 Long: 03302.0312200 Alt: 17.2629
-Lat: 6857.1466574 Long: 03302.0312190 Alt: 17.2693
-Lat: 6857.1466574 Long: 03302.0312190 Alt: 17.2693
-Lat: 6857.1466589 Long: 03302.0312049 Alt: 17.2860
-Lat: 6857.1466608 Long: 03302.0312032 Alt: 17.2851
-Lat: 6857.1466608 Long: 03302.0312032 Alt: 17.2851
-Lat: 6857.1466608 Long: 03302.0312032 Alt: 17.2851
-Lat: 6857.1466594 Long: 03302.0311940 Alt: 17.2972
-Lat: 6857.1466588 Long: 03302.0311938 Alt: 17.3127
-Lat: 6857.1466594 Long: 03302.0311914 Alt: 17.3162
-Lat: 6857.1466568 Long: 03302.0311798 Alt: 17.3270
-Lat: 6857.1466561 Long: 03302.0311699 Alt: 17.3281
-Lat: 6857.1466552 Long: 03302.0311591 Alt: 17.3240
-Lat: 6857.1466556 Long: 03302.0311554 Alt: 17.3393
-Lat: 6857.1466557 Long: 03302.0311546 Alt: 17.3416
-Lat: 6857.1466557 Long: 03302.0311546 Alt: 17.3416
-Lat: 6857.1466560 Long: 03302.0311537 Alt: 17.3496
-Lat: 6857.1466548 Long: 03302.0311546 Alt: 17.3541
-Lat: 6857.1466511 Long: 03302.0311469 Alt: 17.3521
-Lat: 6857.1466497 Long: 03302.0311469 Alt: 17.3633
-*/
