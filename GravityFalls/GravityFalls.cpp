@@ -14,7 +14,7 @@
 #include "Socket.h"
 #include "Address.h"
 
-#pragma comment( lib, "ws2_32.lib" )
+//#pragma comment( lib, "ws2_32.lib" )
 
 
 const int SCREEN_WIDTH = 1000;
@@ -29,6 +29,8 @@ const std::string DEF_IMG_FOLDER = "img/";
 
 SDL_Window* win = nullptr;
 SDL_Renderer* renderer = nullptr;
+
+using namespace std;
 
 int init() {
 if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -75,7 +77,17 @@ inline void ShutdownSockets()
 	WSACleanup();
 }
 
-using namespace std;
+pointXYGeo getCoordFromLine(string coordLine) {
+	long double x = 0;
+	long double y = 0;
+	//cout << coordLine << "(" << coordLine[0] << ", " << coordLine[coordLine.length() - 1] << "): ";
+	if ((coordLine[0] == ':') && (coordLine[coordLine.length() - 1] == '!'))
+	{
+		y = atof(coordLine.substr(3, 10).c_str());
+		x = atof(coordLine.substr(17, 10).c_str());
+	}
+	return { x, y };
+}
 
 int SDL_main(int argc, char* argv[])
 {
@@ -218,7 +230,16 @@ int SDL_main(int argc, char* argv[])
 			if (!bytes_read)
 				break;
 			//printf("received packet from %d.%d.%d.%d:%d (%d bytes)\n", sender.GetA(), sender.GetB(), sender.GetC(), sender.GetD(), sender.GetPort(), bytes_read);
-			cout << buffer << endl;
+			//cout << buffer << endl;
+			string sName(reinterpret_cast<char*>(buffer));
+			pointXYGeo geoCoord = getCoordFromLine(sName);
+			if ((geoCoord.x != 0) && (geoCoord.y != 0)) {
+
+				int x_coord = (geoCoord.x - DEF_LNG_X) / PX_TO_LNG_X;
+				int y_coord = (geoCoord.y - DEF_LAT_Y) / PX_TO_LAT_Y;
+				//boat->setCoordsOnWindow(x_coord - boat->getWidthHeight().x / 2, y_coord - boat->getWidthHeight().y / 2);
+				cout << "x:" << x_coord << " y:" << y_coord << endl;
+			}
 		}
 	}
 	//closesocket(socket);

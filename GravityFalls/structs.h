@@ -11,3 +11,9 @@ struct pointXYFloat
 	float x;
 	float y;
 };
+
+struct pointXYGeo
+{
+	long double x;
+	long double y;
+};
