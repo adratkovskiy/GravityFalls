@@ -93,8 +93,3 @@ void AppState::setScreenScrollStart(pointXY screenScrollStart)
 	screenScrollStart_ = screenScrollStart;
 	screenScrollActive_ = true;
 }
-
-/*void AppState::setTarget(Picture* target)
-{
-	target_ = target;
-}*/

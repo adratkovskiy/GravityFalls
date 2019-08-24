@@ -13,6 +13,7 @@
 #include "structs.h"
 #include "Socket.h"
 #include "Address.h"
+#include "GpsMath.h"
 
 //#pragma comment( lib, "ws2_32.lib" )
 
@@ -29,6 +30,7 @@ const std::string DEF_IMG_FOLDER = "img/";
 
 SDL_Window* win = nullptr;
 SDL_Renderer* renderer = nullptr;
+GpsMath gps;
 
 using namespace std;
 
@@ -118,13 +120,14 @@ int SDL_main(int argc, char* argv[])
 	ScreenText* screenScrollText = new ScreenText(12, { 255, 255, 255 }, renderer, 0, 80);
 	ScreenText* sysTimeText = new ScreenText(12, { 255, 255, 255 }, renderer, SCREEN_WIDTH - 200, 0);
 	AppState* aState = new AppState(MOVE_SPEED);
+	aState->setScreenScroll({SCREEN_WIDTH / -2, SCREEN_HEIGHT / -2 });
 	Images* backgroundAtlas = new Images(DEF_IMG_FOLDER, "back.png", renderer);
 	SDL_Rect tmpCoords = { 0, 0, TILE_SIZE, TILE_SIZE };
 	Picture* background = new Picture(tmpCoords, backgroundAtlas, "background", aState);
 	background->setCoordsOnWindow(0, SCREEN_HEIGHT - tmpCoords.h);
 	tmpCoords = { 1001, 0, 27, 86 };
-	Picture* boat = new Picture(tmpCoords, backgroundAtlas, "ship", aState);
-	boat->setCoordsOnWindow(SCREEN_WIDTH / 2 - tmpCoords.w / 2, SCREEN_HEIGHT / 2 - tmpCoords.h / 2);
+	Picture* boat = new Picture(tmpCoords, backgroundAtlas, "boat", aState);
+	boat->setCoordsOnWindow(0 - tmpCoords.w / 2, 0 - tmpCoords.h / 2);
 	tmpCoords = { 1029, 0, 62, 62 };
 	Picture* targetToGo = new Picture(tmpCoords, backgroundAtlas, "targetToGo", aState);
 	SDL_Event e;
@@ -152,7 +155,7 @@ int SDL_main(int argc, char* argv[])
 			case SDL_MOUSEBUTTONDOWN:
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
-					aState->setScreenScrollStart({ e.motion.x - screenScroll.x, e.motion.y - screenScroll.y });
+					aState->setScreenScrollStart({ screenScroll.x + e.motion.x , screenScroll.y + e.motion.y });
 					screenScrollOld = { screenScroll.x , screenScroll.y };
 				}
 				break;
@@ -161,7 +164,7 @@ int SDL_main(int argc, char* argv[])
 				if (e.button.button == SDL_BUTTON_LEFT)
 				{
 					if ((screenScrollOld.x == screenScroll.x) && (screenScrollOld.y == screenScroll.y)) {
-						aState->setTarget(e.motion.x - screenScroll.x, e.motion.y - screenScroll.y);
+						aState->setTarget(screenScroll.x + e.motion.x, screenScroll.y + e.motion.y);
 					}
 					aState->setScreenScrollActive(false);
 				}
@@ -169,27 +172,27 @@ int SDL_main(int argc, char* argv[])
 			}
 		}
 		if (aState->getScreenScrollActive()) {
-			aState->setScreenScroll({ e.motion.x - aState->getScreenScrollStart().x, e.motion.y - aState->getScreenScrollStart().y });
+			aState->setScreenScroll({ aState->getScreenScrollStart().x - e.motion.x, aState->getScreenScrollStart().y - e.motion.y });
 		}
 		r.x = x;
 		r.y = y;
 		int x_max, x_min, y_max, y_min;
 		SDL_RenderClear(renderer);
-		if (screenScroll.x * (-1) <= 0) {
-			x_min = (screenScroll.x * (-1) / TILE_SIZE) - 1;
+		if (screenScroll.x <= 0) {
+			x_min = (screenScroll.x / TILE_SIZE) - 1;
 			x_max = 0;
 		}
 		else {
 			x_min = 0;
-			x_max = (screenScroll.x * (-1) / TILE_SIZE) + 1;
+			x_max = (screenScroll.x / TILE_SIZE) + 1;
 		}
-		if (screenScroll.y * (-1) <= 0) {
-			y_min = (screenScroll.y * (-1) / TILE_SIZE) - 1;
+		if (screenScroll.y <= 0) {
+			y_min = (screenScroll.y / TILE_SIZE) - 1;
 			y_max = 0;
 		}
 		else {
 			y_min = 0;
-			y_max = (screenScroll.y * (-1) / TILE_SIZE) + 1;
+			y_max = (screenScroll.y / TILE_SIZE) + 1;
 		}
 		int sum = 0;
 		for (int x = x_min; x <= x_max; x++) {

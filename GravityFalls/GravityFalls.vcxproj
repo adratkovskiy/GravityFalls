@@ -151,6 +151,7 @@
   <ItemGroup>
     <ClCompile Include="Address.cpp" />
     <ClCompile Include="AppState.cpp" />
+    <ClCompile Include="GpsMath.cpp" />
     <ClCompile Include="GravityFalls.cpp" />
     <ClCompile Include="Images.cpp" />
     <ClCompile Include="Picture.cpp" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <ClInclude Include="Address.h" />
     <ClInclude Include="AppState.h" />
+    <ClInclude Include="GpsMath.h" />
     <ClInclude Include="Images.h" />
     <ClInclude Include="Picture.h" />
     <ClInclude Include="ScreenText.h" />
