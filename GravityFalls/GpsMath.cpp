@@ -1,5 +1,11 @@
 #include "GpsMath.h"
 
+GpsMath::GpsMath()
+{
+	GPS.latitude_c = GPS_Point.latitude_c = 'N';
+	GPS.longitude_c = GPS_Point.longitude_c = 'E';
+}
+
 double GpsMath::gps_convert_to_rad(unsigned long int GPS_DATA, char c)
 {
 	double rad;
@@ -42,7 +48,7 @@ double GpsMath::gps_distance()
 	y = sqrt(pow(lat2_cos * sin_delta_long, 2) + pow(lat1_cos * lat2_sin - lat1_sin * lat2_cos * cos_delta_long, 2));
 	x = lat1_sin * lat2_sin + lat1_cos * lat2_cos * cos_delta_long;
 
-	return (atan2(y, x) * EATH_RADIUS);
+	return (atan2(y, x) * EATH_RADIUS) / 1000;
 }
 
 double GpsMath::gps_angle()
@@ -118,4 +124,16 @@ double GpsMath::gps_angle()
 
 	tc = atn2 - (2 * M_PI * (floor((atn2) / (2 * M_PI))));
 	return 360 - ((tc * 180) / M_PI);
+}
+
+void GpsMath::setGPS(unsigned long latitude, unsigned long longitude)
+{
+	GPS.latitude = latitude;
+	GPS.longitude = longitude;
+}
+
+void GpsMath::setGPS_Point(unsigned long latitude, unsigned long longitude)
+{
+	GPS_Point.latitude = latitude;
+	GPS_Point.longitude = longitude;
 }
