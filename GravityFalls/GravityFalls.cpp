@@ -224,9 +224,15 @@ int SDL_main(int argc, char* argv[])
 		cursorCoordGPSText->drawText(std::string("Cursor LNG: 33°:") + std::to_string((e.motion.x - screenScroll.x) * PX_TO_LNG_X + DEF_LNG_X) + std::string(" LAT: 68°") + std::to_string((e.motion.y - screenScroll.y) * PX_TO_LAT_Y + DEF_LAT_Y));
 		screenScrollText->drawText(std::string("Screen Scroll X:") + std::to_string(screenScroll.x) + std::string(" Y:") + std::to_string(screenScroll.y));
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
-		gps.setGPS(03302.0312282, 01.1466542);
-		gps.setGPS_Point(03302.0312282, 89.1466542);
-		gpsDistanceText->drawText("Distance: " + std::to_string(gps.gps_distance()));
+		//gps.setGPS(03302.0312282, 01.1466542);
+		//gps.setGPS_Point(03302.0312282, 89.1466542);
+		/*Lat: 6857.1466542 Long: 03302.0312282 Alt: 17.2614
+		Lat: 6857.1466550 Long: 03302.0312277 Alt: 17.2673*/
+		int degrees = 68;
+		double minutes = 57.1466542;
+		double mydegrees = degrees * 1.0 + (minutes / 60.0);
+		mydegrees = (mydegrees * 1000000.0) / 1000000.0;
+		gpsDistanceText->drawText("Distance: " + std::to_string(mydegrees));
 		
 		SDL_RenderPresent(renderer);
 		aState->createApp();
