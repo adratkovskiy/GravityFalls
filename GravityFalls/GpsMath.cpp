@@ -2,138 +2,58 @@
 
 GpsMath::GpsMath()
 {
-	GPS.latitude_c = GPS_Point.latitude_c = 'N';
-	GPS.longitude_c = GPS_Point.longitude_c = 'E';
+	gpsMain_.latitude_c = 'N';
+	gpsTarget_.latitude_c = 'N';
+	gpsMain_.longitude_c = 'E';
+	gpsTarget_.longitude_c = 'E';
+	gpsMain_.altitude = 0;
+	gpsTarget_.altitude = 0;
+	/*gpsMain_.latitude = toDegMin(6860.1466542);
+	gpsMain_.longitude = toDegMin(03304.0312282);
+	gpsTarget_.latitude = toDegMin(6858.1466542);
+	gpsTarget_.longitude = toDegMin(03302.0312282);*/
 }
 
-double GpsMath::gps_convert_to_rad(unsigned long int GPS_DATA, char c)
+long double GpsMath::toDegMin(long double gpsCoord)
 {
-	double rad;
-
-	rad = (double)gps_convert_to_grad(GPS_DATA) * M_PI / 1000000 / 180;
-	if ((c == 'S') | (c == 'W'))
-		rad = -1 * rad;
-	return rad;
+	string tmpStr = to_string(gpsCoord);
+	int dot = tmpStr.find('.');
+	string tmpDegrees = tmpStr.substr(0, dot - 2);
+	string tmpMinutes = tmpStr.substr(dot - 2);
+	int degrees = atof(tmpDegrees.c_str());
+	long double minutes = atof(tmpMinutes.c_str());
+	long double mydegrees = degrees * 1.0 + (minutes / 60.0);
+	mydegrees = (mydegrees * 1000000.0) / 1000000.0;
+	return mydegrees;
 }
 
-unsigned long int GpsMath::gps_convert_to_grad(unsigned long int GPS_DATA)
+long double GpsMath::deg2Rad(long double gpsCoord)
 {
-	unsigned long int grad, min;
-	grad = (GPS_DATA / 1000000) * 1000000;
-	min = ((GPS_DATA - grad) * 100) / 60;
-	return grad + min;
+	return gpsCoord * 4.0 * atan(1.0) / 180.0;
 }
 
-double GpsMath::gps_distance()
+long double GpsMath::getDistanceBetween2Points()
 {
-	double lat1_cos, lat2_cos, lat1_sin, lat2_sin;
-	double lat1, long1, lat2, long2;
-	double sin_delta_long, cos_delta_long;
-	double y, x;
-
-	lat1 = gps_convert_to_rad(GPS.latitude, GPS.latitude_c);
-	long1 = gps_convert_to_rad(GPS.longitude, GPS.longitude_c);
-
-	lat2 = gps_convert_to_rad(GPS_Point.latitude, GPS_Point.latitude_c); // Координаты точки
-	long2 = gps_convert_to_rad(GPS_Point.longitude, GPS_Point.longitude_c);
-
-	lat1_cos = cos(lat1);
-	lat2_cos = cos(lat2);
-	lat1_sin = sin(lat1);
-	lat2_sin = sin(lat2);
-
-	sin_delta_long = sin(long2 - long1);
-	cos_delta_long = cos(long2 - long1);
-
-	y = sqrt(pow(lat2_cos * sin_delta_long, 2) + pow(lat1_cos * lat2_sin - lat1_sin * lat2_cos * cos_delta_long, 2));
-	x = lat1_sin * lat2_sin + lat1_cos * lat2_cos * cos_delta_long;
-
-	return (atan2(y, x) * EATH_RADIUS) / 1000;
+	long double trueAngle1 = getTrueAngle(gpsMain_);
+	long double trueAngle2 = getTrueAngle(gpsTarget_);
+	long double pointRadius1 = getPointRadius(gpsMain_, trueAngle1);
+	long double pointRadius2 = getPointRadius(gpsTarget_, trueAngle2);
+	long double earthPoint1_x = pointRadius1 * cos(deg2Rad(trueAngle1));
+	long double earthPoint1_y = pointRadius1 * sin(deg2Rad(trueAngle1));
+	long double earthPoint2_x = pointRadius2 * cos(deg2Rad(trueAngle2));
+	long double earthPoint2_y = pointRadius2 * sin(deg2Rad(trueAngle2));
+	long double x = sqrt(pow((earthPoint1_x - earthPoint2_x), 2) + pow((earthPoint1_y - earthPoint2_y), 2));
+	long double y = M_PI * ((earthPoint1_x + earthPoint2_x) / 360) * (gpsMain_.longitude - gpsTarget_.longitude);
+	return sqrt(pow(x, 2) + pow(y, 2));
 }
 
-double GpsMath::gps_angle()
+long double GpsMath::getTrueAngle(Gps_Point gpsPoint)
 {
-	double lat1, long1, lat2, long2;
-	double dlon_W, dlon_E, dphi, atn2, dlon, tc;
-	int sign;
-
-	lat1 = gps_convert_to_rad(GPS.latitude, GPS.latitude_c);
-	long1 = gps_convert_to_rad(GPS.longitude, GPS.longitude_c);
-
-	lat2 = gps_convert_to_rad(GPS_Point.latitude, GPS_Point.latitude_c); // Координаты точки
-	long2 = gps_convert_to_rad(GPS_Point.longitude, GPS_Point.longitude_c);
-
-	dlon_W = (long2 - long1) - (2 * M_PI * (floor((long2 - long1) / (2 * M_PI))));
-	dlon_E = (long1 - long2) - (2 * M_PI * (floor((long1 - long2) / (2 * M_PI))));
-	dphi = log((tan((lat2 / 2) + (M_PI / 4))) / (tan((lat1 / 2) + (M_PI / 4))));
-
-	if (dlon_W < dlon_E) {
-		dlon_W = -1 * dlon_W;
-
-		//get sign
-		if (dlon_W >= 0)
-			sign = 1;
-		else
-			sign = -1;
-
-		if (abs(dlon_W) >= abs(dphi)) {
-			atn2 = (sign * M_PI / 2) - atan(dphi / dlon_W);
-		}
-		else {
-			if (dphi > 0) {
-				atn2 = atan(dlon_W / dphi);
-			}
-			else {
-				if ((-1 * dlon_W) >= 0) {
-					atn2 = M_PI + atan(dlon_W / dphi);
-				}
-				else {
-					atn2 = (-1 * M_PI) + atan(dlon_W / dphi);
-				}
-			}
-		}
-	}
-	else {
-		//get sign
-		if (dlon_W >= 0)
-			sign = 1;
-		else
-			sign = -1;
-
-		if (abs(dlon_E) >= abs(dphi)) {
-			if (dlon_E > 0)
-				atn2 = sign * M_PI / 2 - atan(dphi / (dlon_E));
-			else
-				atn2 = 0;
-		}
-		else {
-			if (dphi > 0) {
-				atn2 = atan((dlon_E) / dphi);
-			}
-			else {
-				if ((dlon_E) >= 0) {
-					atn2 = M_PI + atan((dlon_E) / dphi);
-				}
-				else {
-					atn2 = (-1 * M_PI) + atan((dlon_E) / dphi);
-				}
-			}
-		}
-		dlon = dlon_E;
-	}
-
-	tc = atn2 - (2 * M_PI * (floor((atn2) / (2 * M_PI))));
-	return 360 - ((tc * 180) / M_PI);
+	return atan(((MINOR_AXIS_POW_2 / MAJOR_AXIS_POW_2) * tan(deg2Rad(gpsPoint.latitude)))) * 180 / M_PI;
 }
 
-void GpsMath::setGPS(unsigned long latitude, unsigned long longitude)
+long double GpsMath::getPointRadius(Gps_Point gpsPoint, long double trueAngle)
 {
-	GPS.latitude = latitude;
-	GPS.longitude = longitude;
+	return (1 / sqrt((pow(cos(deg2Rad(trueAngle)), 2) / MAJOR_AXIS_POW_2) + (pow(sin(deg2Rad(trueAngle)), 2) / MINOR_AXIS_POW_2))) + gpsPoint.altitude;
 }
 
-void GpsMath::setGPS_Point(unsigned long latitude, unsigned long longitude)
-{
-	GPS_Point.latitude = latitude;
-	GPS_Point.longitude = longitude;
-}
