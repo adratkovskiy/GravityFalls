@@ -20,10 +20,10 @@ const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 const float MOVE_SPEED = 2;
 const int TILE_SIZE = 1000;
-const long double DEF_LAT_Y = 68.952440;
+/*const long double DEF_LAT_Y = 68.952440;
 const long double DEF_LNG_X = 33.033848;
 const long double PX_TO_LAT_Y = -0.000013311634;
-const long double PX_TO_LNG_X = 0.000037065027;
+const long double PX_TO_LNG_X = 0.000037065027;*/
 const std::string DEF_IMG_FOLDER = "img/";
 const int DEF_FONT_SIZE = 12;
 
@@ -217,9 +217,13 @@ int SDL_main(int argc, char* argv[])
 		boat->drawPic();
 		// text block
 		boatCoordText->drawText(std::string("Boat X:") + std::to_string(boat->getSelfCenter().x) + std::string(" Y:") + std::to_string(boat->getSelfCenter().y));
-		boatCoordGPSText->drawText(std::string("Boat LNG: 33°") + std::to_string(boat->getSelfCenter().x * PX_TO_LNG_X + DEF_LNG_X) + std::string(" LAT: 68°") + std::to_string(boat->getSelfCenter().y * PX_TO_LAT_Y + DEF_LAT_Y));
+		gpsXY boatCoordGPS = gps.pxToGps({boat->getSelfCenter().x, boat->getSelfCenter().y });
+		gps.setGpsMain(boatCoordGPS.y, boatCoordGPS.x);
+		boatCoordGPSText->drawText(std::string("Boat LNG:") + std::to_string(boatCoordGPS.x) + std::string(" LAT:") + std::to_string(boatCoordGPS.y));
 		cursorCoordText->drawText(std::string("Cursor X:") + std::to_string(e.motion.x) + std::string(" Y:") + std::to_string(e.motion.y));
-		cursorCoordGPSText->drawText(std::string("Cursor LNG: 33°:") + std::to_string((e.motion.x - screenScroll.x) * PX_TO_LNG_X + DEF_LNG_X) + std::string(" LAT: 68°") + std::to_string((e.motion.y - screenScroll.y) * PX_TO_LAT_Y + DEF_LAT_Y));
+		gpsXY cursorCoordGPS = gps.pxToGps({ (e.motion.x + screenScroll.x) , (e.motion.y + screenScroll.y) });
+		gps.setGpsTarget(cursorCoordGPS.y, cursorCoordGPS.x);
+		cursorCoordGPSText->drawText(std::string("Cursor LNG:") + std::to_string(cursorCoordGPS.x) + std::string(" LAT:") + std::to_string(cursorCoordGPS.y));
 		screenScrollText->drawText(std::string("Screen Scroll X:") + std::to_string(screenScroll.x) + std::string(" Y:") + std::to_string(screenScroll.y));
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		//gps.toDegMin(6857.1466550);

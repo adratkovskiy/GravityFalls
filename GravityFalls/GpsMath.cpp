@@ -7,6 +7,14 @@ GpsMath::GpsMath()
 	gpsMain_.longitude_c = 'E';
 	gpsTarget_.longitude_c = 'E';
 	gpsMain_.altitude = 0;
+	gpsToM_.x = GPS_TO_M_LNG_X_COOF;
+	gpsToM_.y = GPS_TO_M_LAT_Y_COOF;
+	mToGps_.x = 1 / gpsToM_.x;
+	mToGps_.y = 1 / gpsToM_.y;
+	gpsToPx_.x = gpsToM_.x * M_TO_PX_COOF;
+	gpsToPx_.y = gpsToM_.y * M_TO_PX_COOF;
+	pxToGps_.x = 1 / gpsToPx_.x;
+	pxToGps_.y = 1 / gpsToPx_.y;
 	gpsTarget_.altitude = 0;
 	/*gpsMain_.latitude = toDegMin(6860.1466542);
 	gpsMain_.longitude = toDegMin(03304.0312282);
@@ -55,6 +63,11 @@ long double GpsMath::getTrueAngle(Gps_Point gpsPoint)
 long double GpsMath::getPointRadius(Gps_Point gpsPoint, long double trueAngle)
 {
 	return (1 / sqrt((pow(cos(deg2Rad(trueAngle)), 2) / MAJOR_AXIS_POW_2) + (pow(sin(deg2Rad(trueAngle)), 2) / MINOR_AXIS_POW_2))) + gpsPoint.altitude;
+}
+
+gpsXY GpsMath::pxToGps(pointXY point)
+{
+	return { (point.x * pxToGps_.x + LNG_DEF_X), (point.y * pxToGps_.y + LAT_DEF_Y)};
 }
 
 void GpsMath::setGpsMain(long double latitude, long double longitude)

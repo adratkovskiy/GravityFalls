@@ -25,3 +25,9 @@ typedef struct {
 	char            longitude_c;    // Широта литера
 	long double	altitude;		// Высота
 } Gps_Point;
+
+struct gpsXY
+{
+	long double x;
+	long double y;
+};
