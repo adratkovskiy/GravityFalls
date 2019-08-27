@@ -15,15 +15,13 @@
 #include "Address.h"
 #include "GpsMath.h"
 
-//#pragma comment( lib, "ws2_32.lib" )
-
 
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 const float MOVE_SPEED = 2;
 const int TILE_SIZE = 1000;
-const long double DEF_LAT_Y = 57.1466547; //68°57.1466547
-const long double DEF_LNG_X = 02.0312438; //33°02.0312438
+const long double DEF_LAT_Y = 68.952440;
+const long double DEF_LNG_X = 33.033848;
 const long double PX_TO_LAT_Y = -0.000013311634;
 const long double PX_TO_LNG_X = 0.000037065027;
 const std::string DEF_IMG_FOLDER = "img/";
@@ -83,11 +81,10 @@ inline void ShutdownSockets()
 pointXYGeo getCoordFromLine(string coordLine) {
 	long double x = 0;
 	long double y = 0;
-	//cout << coordLine << "(" << coordLine[0] << ", " << coordLine[coordLine.length() - 1] << "): ";
 	if ((coordLine[0] == ':') && (coordLine[coordLine.length() - 1] == '!'))
 	{
-		y = atof(coordLine.substr(3, 10).c_str());
-		x = atof(coordLine.substr(17, 10).c_str());
+		y = atof(coordLine.substr(1, 12).c_str());
+		x = atof(coordLine.substr(14, 13).c_str());
 	}
 	return { x, y };
 }
@@ -218,6 +215,7 @@ int SDL_main(int argc, char* argv[])
 			}
 		}
 		boat->drawPic();
+		// text block
 		boatCoordText->drawText(std::string("Boat X:") + std::to_string(boat->getSelfCenter().x) + std::string(" Y:") + std::to_string(boat->getSelfCenter().y));
 		boatCoordGPSText->drawText(std::string("Boat LNG: 33°") + std::to_string(boat->getSelfCenter().x * PX_TO_LNG_X + DEF_LNG_X) + std::string(" LAT: 68°") + std::to_string(boat->getSelfCenter().y * PX_TO_LAT_Y + DEF_LAT_Y));
 		cursorCoordText->drawText(std::string("Cursor X:") + std::to_string(e.motion.x) + std::string(" Y:") + std::to_string(e.motion.y));
@@ -226,7 +224,8 @@ int SDL_main(int argc, char* argv[])
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		//gps.toDegMin(6857.1466550);
 		gpsDistanceText->drawText("Distance: " + std::to_string(gps.getDistanceBetween2Points()));
-		
+		//////////////////
+
 		SDL_RenderPresent(renderer);
 		aState->createApp();
 
@@ -241,13 +240,17 @@ int SDL_main(int argc, char* argv[])
 			//cout << buffer << endl;
 			string sName(reinterpret_cast<char*>(buffer));
 			pointXYGeo geoCoord = getCoordFromLine(sName);
-			if ((geoCoord.x != 0) && (geoCoord.y != 0)) {
+			gps.setGpsMain(gps.toDegMin(geoCoord.y), gps.toDegMin(geoCoord.x));
+			//gps.setGpsMain(68.952440, 33.033848);
+			gps.setGpsTarget(68.952440, 33.033848);
+			//cout << to_string(gps.toDegMin(geoCoord.x)) << "(" << to_string(geoCoord.x) << ")" << " " << to_string(gps.toDegMin(geoCoord.y)) << endl;
+			/*if ((geoCoord.x != 0) && (geoCoord.y != 0)) {
 
 				int x_coord = (geoCoord.x - DEF_LNG_X) / PX_TO_LNG_X;
 				int y_coord = (geoCoord.y - DEF_LAT_Y) / PX_TO_LAT_Y;
 				//boat->setCoordsOnWindow(x_coord - boat->getWidthHeight().x / 2, y_coord - boat->getWidthHeight().y / 2);
 				cout << "x:" << x_coord << " y:" << y_coord << endl;
-			}
+			}*/
 		}
 	}
 	//closesocket(socket);

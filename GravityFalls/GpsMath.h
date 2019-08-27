@@ -23,6 +23,8 @@ public:
 	long double getDistanceBetween2Points();
 	long double getTrueAngle(Gps_Point gpsPoint);
 	long double getPointRadius(Gps_Point gpsPoint, long double trueAngle);
+	void setGpsMain(long double latitude, long double longitude);
+	void setGpsTarget(long double latitude, long double longitude);
 
 private:
 	Gps_Point gpsMain_;

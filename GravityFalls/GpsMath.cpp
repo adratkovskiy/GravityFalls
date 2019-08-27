@@ -57,3 +57,15 @@ long double GpsMath::getPointRadius(Gps_Point gpsPoint, long double trueAngle)
 	return (1 / sqrt((pow(cos(deg2Rad(trueAngle)), 2) / MAJOR_AXIS_POW_2) + (pow(sin(deg2Rad(trueAngle)), 2) / MINOR_AXIS_POW_2))) + gpsPoint.altitude;
 }
 
+void GpsMath::setGpsMain(long double latitude, long double longitude)
+{
+	gpsMain_.latitude = latitude;
+	gpsMain_.longitude = longitude;
+}
+
+void GpsMath::setGpsTarget(long double latitude, long double longitude)
+{
+	gpsTarget_.latitude = latitude;
+	gpsTarget_.longitude = longitude;
+}
+
