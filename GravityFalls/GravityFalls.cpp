@@ -215,7 +215,7 @@ int SDL_main(int argc, char* argv[])
 			}
 		}
 		boat->drawPic();
-		// text block
+
 		boatCoordText->drawText(std::string("Boat X:") + std::to_string(boat->getSelfCenter().x) + std::string(" Y:") + std::to_string(boat->getSelfCenter().y));
 		gpsXY boatCoordGPS = gps.pxToGps({boat->getSelfCenter().x, boat->getSelfCenter().y });
 		gps.setGpsMain(boatCoordGPS.y, boatCoordGPS.x);
@@ -226,9 +226,8 @@ int SDL_main(int argc, char* argv[])
 		cursorCoordGPSText->drawText(std::string("Cursor LNG:") + std::to_string(cursorCoordGPS.x) + std::string(" LAT:") + std::to_string(cursorCoordGPS.y));
 		screenScrollText->drawText(std::string("Screen Scroll X:") + std::to_string(screenScroll.x) + std::string(" Y:") + std::to_string(screenScroll.y));
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
-		//gps.toDegMin(6857.1466550);
-		gpsDistanceText->drawText("Distance: " + std::to_string(gps.getDistanceBetween2Points()));
-		//////////////////
+		string distance = to_string(round(gps.getDistanceBetween2Points() * 100) / 100);
+		gpsDistanceText->drawText("Distance: " + distance.substr(0, distance.length() - 4));
 
 		SDL_RenderPresent(renderer);
 		aState->createApp();
@@ -240,26 +239,12 @@ int SDL_main(int argc, char* argv[])
 			int bytes_read = socket.Receive(sender, buffer, sizeof(buffer));
 			if (!bytes_read)
 				break;
-			//printf("received packet from %d.%d.%d.%d:%d (%d bytes)\n", sender.GetA(), sender.GetB(), sender.GetC(), sender.GetD(), sender.GetPort(), bytes_read);
-			//cout << buffer << endl;
 			string sName(reinterpret_cast<char*>(buffer));
 			pointXYGeo geoCoord = getCoordFromLine(sName);
-			gps.setGpsMain(gps.toDegMin(geoCoord.y), gps.toDegMin(geoCoord.x));
-			//gps.setGpsMain(68.952440, 33.033848);
-			gps.setGpsTarget(68.952440, 33.033848);
-			//cout << to_string(gps.toDegMin(geoCoord.x)) << "(" << to_string(geoCoord.x) << ")" << " " << to_string(gps.toDegMin(geoCoord.y)) << endl;
-			/*if ((geoCoord.x != 0) && (geoCoord.y != 0)) {
-
-				int x_coord = (geoCoord.x - DEF_LNG_X) / PX_TO_LNG_X;
-				int y_coord = (geoCoord.y - DEF_LAT_Y) / PX_TO_LAT_Y;
-				//boat->setCoordsOnWindow(x_coord - boat->getWidthHeight().x / 2, y_coord - boat->getWidthHeight().y / 2);
-				cout << "x:" << x_coord << " y:" << y_coord << endl;
-			}*/
+			pointXY toPx = gps.gpsToPx({ gps.toDegMin(geoCoord.x) , gps.toDegMin(geoCoord.y) });
+			cout << to_string(gps.toDegMin(geoCoord.x)) << "," << to_string(gps.toDegMin(geoCoord.y)) << "(" << toPx.x << "," << toPx.y << ")"<< endl;
+			boat->setCoordsOnWindow(toPx.x - boat->getWidthHeight().x / 2, toPx.y - boat->getWidthHeight().y / 2);
 		}
 	}
-	//closesocket(socket);
 	return 0;
 }
-
-/*Lat: 6857.1466542 Long: 03302.0312282 Alt: 17.2614
-Lat: 6857.1466550 Long: 03302.0312277 Alt: 17.2673*/

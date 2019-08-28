@@ -25,10 +25,13 @@ public:
 	GpsMath();
 	long double toDegMin(long double gpsCoord);
 	long double deg2Rad(long double gpsCoord);
+	gpsXY pxToGps(pointXY point);
+	pointXY gpsToPx(gpsXY coord);
+
 	long double getDistanceBetween2Points();
 	long double getTrueAngle(Gps_Point gpsPoint);
 	long double getPointRadius(Gps_Point gpsPoint, long double trueAngle);
-	gpsXY pxToGps(pointXY point);
+
 	void setGpsMain(long double latitude, long double longitude);
 	void setGpsTarget(long double latitude, long double longitude);
 

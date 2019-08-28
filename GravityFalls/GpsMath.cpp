@@ -70,6 +70,12 @@ gpsXY GpsMath::pxToGps(pointXY point)
 	return { (point.x * pxToGps_.x + LNG_DEF_X), (point.y * pxToGps_.y + LAT_DEF_Y)};
 }
 
+pointXY GpsMath::gpsToPx(gpsXY coord)
+{
+
+	return { (int)((coord.x - LNG_DEF_X) * 1 / pxToGps_.x), (int)((coord.y - LAT_DEF_Y) * 1 / pxToGps_.y) };
+}
+
 void GpsMath::setGpsMain(long double latitude, long double longitude)
 {
 	gpsMain_.latitude = latitude;
