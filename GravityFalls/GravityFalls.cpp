@@ -4,6 +4,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <winsock2.h>
 #include <assert.h>
+#include <vector>
 
 #include "Images.h"
 #include "AppState.h"
@@ -20,6 +21,7 @@ const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 const float MOVE_SPEED = 2;
 const int TILE_SIZE = 1000;
+const int MAX_COORD_POINTS = 100;
 /*const long double DEF_LAT_Y = 68.952440;
 const long double DEF_LNG_X = 33.033848;
 const long double PX_TO_LAT_Y = -0.000013311634;
@@ -117,6 +119,7 @@ int SDL_main(int argc, char* argv[])
 	ScreenText* cursorCoordGPSText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 60);
 	ScreenText* screenScrollText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 80);
 	ScreenText* gpsDistanceText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 100);
+	ScreenText* pointCountText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 120);
 	ScreenText* sysTimeText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, SCREEN_WIDTH - 200, 0);
 	AppState* aState = new AppState(MOVE_SPEED);
 	aState->setScreenScroll({SCREEN_WIDTH / -2, SCREEN_HEIGHT / -2 });
@@ -125,10 +128,18 @@ int SDL_main(int argc, char* argv[])
 	Picture* background = new Picture(tmpCoords, backgroundAtlas, "background", aState);
 	background->setCoordsOnWindow(0, SCREEN_HEIGHT - tmpCoords.h);
 	tmpCoords = { 1001, 0, 27, 86 };
+	//1091, 0, 5, 5 // 1096, 0, 5, 5
 	Picture* boat = new Picture(tmpCoords, backgroundAtlas, "boat", aState);
 	boat->setCoordsOnWindow(0 - tmpCoords.w / 2, 0 - tmpCoords.h / 2);
 	tmpCoords = { 1029, 0, 62, 62 };
 	Picture* targetToGo = new Picture(tmpCoords, backgroundAtlas, "targetToGo", aState);
+	tmpCoords = { 1091, 0, 5, 5 };
+	Picture* blackCross = new Picture(tmpCoords, backgroundAtlas, "black cross", aState);
+	tmpCoords = { 1096, 0, 5, 5 };
+	Picture* yellowCross = new Picture(tmpCoords, backgroundAtlas, "yellow cross", aState);
+
+	vector<pointXY> allPoints;
+
 	SDL_Event e;
 	SDL_Rect r;
 	int x = 0;
@@ -138,6 +149,7 @@ int SDL_main(int argc, char* argv[])
 
 	bool run = true;
 	pointXY screenScrollOld;
+	pointXY prevXY = { 0, 0 };
 
 	while (run) {
 		pointXY screenScroll = aState->getScreenScroll();
@@ -215,7 +227,15 @@ int SDL_main(int argc, char* argv[])
 			}
 		}
 		boat->drawPic();
+		if ((prevXY.x == boat->getSelfCenter().x) && (prevXY.y == boat->getSelfCenter().y)) {
 
+		}
+		else {
+			allPoints.push_back({ boat->getSelfCenter().x, boat->getSelfCenter().y });
+			prevXY.x = boat->getSelfCenter().x;
+			prevXY.y = boat->getSelfCenter().y;
+		}
+		
 		boatCoordText->drawText(std::string("Boat X:") + std::to_string(boat->getSelfCenter().x) + std::string(" Y:") + std::to_string(boat->getSelfCenter().y));
 		gpsXY boatCoordGPS = gps.pxToGps({boat->getSelfCenter().x, boat->getSelfCenter().y });
 		gps.setGpsMain(boatCoordGPS.y, boatCoordGPS.x);
@@ -228,6 +248,22 @@ int SDL_main(int argc, char* argv[])
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		string distance = to_string(round(gps.getDistanceBetween2Points() * 100) / 100);
 		gpsDistanceText->drawText("Distance: " + distance.substr(0, distance.length() - 4));
+		int pointCount = 0;
+		for (vector<pointXY>::iterator It = allPoints.begin(); It < allPoints.end(); It++)
+		{
+			if (It + 1 == allPoints.end()) {
+				yellowCross->setCoordsOnWindow(It->x, It->y);
+				yellowCross->drawPic();
+			}
+			else
+			{
+				blackCross->setCoordsOnWindow(It->x, It->y);
+				blackCross->drawPic();
+			}
+			pointCount++;
+				
+		}
+		pointCountText->drawText("Gps point count:" + to_string(pointCount));
 
 		SDL_RenderPresent(renderer);
 		aState->createApp();
