@@ -8,8 +8,8 @@ struct pointXY
 
 struct pointXYFloat
 {
-	float x;
-	float y;
+	double x;
+	double y;
 };
 
 struct pointXYGeo

@@ -133,9 +133,9 @@ int SDL_main(int argc, char* argv[])
 	boat->setCoordsOnWindow(0 - tmpCoords.w / 2, 0 - tmpCoords.h / 2);
 	tmpCoords = { 1029, 0, 62, 62 };
 	Picture* targetToGo = new Picture(tmpCoords, backgroundAtlas, "targetToGo", aState);
-	tmpCoords = { 1091, 0, 5, 5 };
+	tmpCoords = { 1091, 0, 7, 7 };
 	Picture* blackCross = new Picture(tmpCoords, backgroundAtlas, "black cross", aState);
-	tmpCoords = { 1096, 0, 5, 5 };
+	tmpCoords = { 1098, 0, 7, 7 };
 	Picture* yellowCross = new Picture(tmpCoords, backgroundAtlas, "yellow cross", aState);
 
 	vector<pointXY> allPoints;
@@ -223,10 +223,10 @@ int SDL_main(int argc, char* argv[])
 				aState->setShipMove(false);
 			}
 			else {
-				boat->movePic();
+				//boat->movePic();
 			}
 		}
-		boat->drawPic();
+		//boat->drawPic();
 		if ((prevXY.x == boat->getSelfCenter().x) && (prevXY.y == boat->getSelfCenter().y)) {
 
 		}
@@ -252,12 +252,12 @@ int SDL_main(int argc, char* argv[])
 		for (vector<pointXY>::iterator It = allPoints.begin(); It < allPoints.end(); It++)
 		{
 			if (It + 1 == allPoints.end()) {
-				yellowCross->setCoordsOnWindow(It->x, It->y);
+				yellowCross->setCoordsOnWindow(It->x - yellowCross->getWidthHeight().x/2, It->y - -yellowCross->getWidthHeight().y / 2);
 				yellowCross->drawPic();
 			}
 			else
 			{
-				blackCross->setCoordsOnWindow(It->x, It->y);
+				blackCross->setCoordsOnWindow(It->x - blackCross->getWidthHeight().x / 2, It->y - blackCross->getWidthHeight().y / 2);
 				blackCross->drawPic();
 			}
 			pointCount++;
