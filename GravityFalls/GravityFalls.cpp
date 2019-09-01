@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <assert.h>
 #include <vector>
+#include <SFML/Window.hpp>
 
 #include "Images.h"
 #include "AppState.h"
@@ -17,15 +18,12 @@
 #include "GpsMath.h"
 
 
+
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 const float MOVE_SPEED = 2;
 const int TILE_SIZE = 1000;
 const int MAX_COORD_POINTS = 100;
-/*const long double DEF_LAT_Y = 68.952440;
-const long double DEF_LNG_X = 33.033848;
-const long double PX_TO_LAT_Y = -0.000013311634;
-const long double PX_TO_LNG_X = 0.000037065027;*/
 const std::string DEF_IMG_FOLDER = "img/";
 const int DEF_FONT_SIZE = 12;
 
@@ -93,6 +91,7 @@ pointXYGeo getCoordFromLine(string coordLine) {
 
 int SDL_main(int argc, char* argv[])
 {
+	
 	if (!InitializeSockets())
 	{
 		printf("failed to initialize sockets\n");
@@ -136,7 +135,7 @@ int SDL_main(int argc, char* argv[])
 	tmpCoords = { 1091, 0, 7, 7 };
 	Picture* blackCross = new Picture(tmpCoords, backgroundAtlas, "black cross", aState);
 	tmpCoords = { 1098, 0, 7, 7 };
-	Picture* yellowCross = new Picture(tmpCoords, backgroundAtlas, "yellow cross", aState);
+	Picture* redCross = new Picture(tmpCoords, backgroundAtlas, "yellow cross", aState);
 
 	vector<pointXY> allPoints;
 
@@ -223,10 +222,10 @@ int SDL_main(int argc, char* argv[])
 				aState->setShipMove(false);
 			}
 			else {
-				//boat->movePic();
+				boat->movePic();
 			}
 		}
-		//boat->drawPic();
+		boat->drawPic();
 		if ((prevXY.x == boat->getSelfCenter().x) && (prevXY.y == boat->getSelfCenter().y)) {
 
 		}
@@ -252,8 +251,8 @@ int SDL_main(int argc, char* argv[])
 		for (vector<pointXY>::iterator It = allPoints.begin(); It < allPoints.end(); It++)
 		{
 			if (It + 1 == allPoints.end()) {
-				yellowCross->setCoordsOnWindow(It->x - yellowCross->getWidthHeight().x/2, It->y - -yellowCross->getWidthHeight().y / 2);
-				yellowCross->drawPic();
+				redCross->setCoordsOnWindow(It->x - redCross->getWidthHeight().x / 2, It->y - - redCross->getWidthHeight().y / 2);
+				redCross->drawPic();
 			}
 			else
 			{
@@ -281,6 +280,9 @@ int SDL_main(int argc, char* argv[])
 			cout << to_string(gps.toDegMin(geoCoord.x)) << "," << to_string(gps.toDegMin(geoCoord.y)) << "(" << toPx.x << "," << toPx.y << ")"<< endl;
 			boat->setCoordsOnWindow(toPx.x - boat->getWidthHeight().x / 2, toPx.y - boat->getWidthHeight().y / 2);
 		}
+		/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+			cout << "left" << endl;
+		}*/
 	}
 	return 0;
 }
