@@ -17,50 +17,21 @@
 #include "Address.h"
 #include "GpsMath.h"
 
-
+using namespace std;
 
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 800;
 const float MOVE_SPEED = 2;
 const int TILE_SIZE = 1000;
 const int MAX_COORD_POINTS = 100;
-const std::string DEF_IMG_FOLDER = "img/";
+const string DEF_IMG_FOLDER = "img/";
 const int DEF_FONT_SIZE = 12;
+const int DEF_PORT = 8012;
 
 SDL_Window* win = nullptr;
 SDL_Renderer* renderer = nullptr;
 GpsMath gps;
-
-using namespace std;
-
-int init() {
-if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-	std::cout << "Can't init: " << SDL_GetError() << std::endl;
-	system("pause");
-	return 1;
-}
-
-win = SDL_CreateWindow("Gi TestTask", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-if (win == NULL) {
-	std::cout << "Can't create window: " << SDL_GetError() << std::endl;
-	system("pause");
-	return 1;
-}
-
-renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-if (renderer == nullptr) {
-	std::cout << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
-	return 1;
-}
-
-if (TTF_Init() == -1)
-{
-	std::cout << " Failed to initialize TTF : " << SDL_GetError() << std::endl;
-	return 1;
-}
-
-return 0;
-}
+Socket sock;
 
 void wait_seconds(float seconds)
 {
@@ -89,29 +60,55 @@ pointXYGeo getCoordFromLine(string coordLine) {
 	return { x, y };
 }
 
-int SDL_main(int argc, char* argv[])
-{
-	
+int init() {
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+		cout << "Can't init: " << SDL_GetError() << endl;
+		system("pause");
+		return 1;
+	}
+
+	win = SDL_CreateWindow("Gi TestTask", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	if (win == NULL) {
+		cout << "Can't create window: " << SDL_GetError() << endl;
+		system("pause");
+		return 1;
+	}
+
+	renderer = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (renderer == nullptr) {
+		cout << "SDL_CreateRenderer Error: " << SDL_GetError() << endl;
+		return 1;
+	}
+
+	if (TTF_Init() == -1)
+	{
+		cout << " Failed to initialize TTF : " << SDL_GetError() << endl;
+		return 1;
+	}
+
 	if (!InitializeSockets())
 	{
 		printf("failed to initialize sockets\n");
 		return 1;
 	}
 
-	int port = 8012;
-	printf("creating socket on port %d\n", port);
-	Socket socket;
-	if (!socket.Open(port))
+	printf("creating socket on port %d\n", DEF_PORT);
+	if (!sock.Open(DEF_PORT))
 	{
 		printf("failed to create socket!\n");
 		return 1;
 	}
-	
-	WorkTimer* timer = new WorkTimer();
+
+	return 0;
+}
+
+int SDL_main(int argc, char* argv[])
+{
 	if (init() == 1) {
 		return 1;
 	}
 
+	WorkTimer* timer = new WorkTimer();
 	ScreenText* boatCoordText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 0);
 	ScreenText* boatCoordGPSText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 20);
 	ScreenText* cursorCoordText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 40);
@@ -152,7 +149,7 @@ int SDL_main(int argc, char* argv[])
 
 	while (run) {
 		pointXY screenScroll = aState->getScreenScroll();
-		while (SDL_PollEvent(&e) != NULL) {
+		while (SDL_PollEvent(&e) != NULL) { // SDL hook buttons
 			if (e.type == SDL_QUIT) {
 				run = false;
 			}
@@ -180,7 +177,7 @@ int SDL_main(int argc, char* argv[])
 				}
 				break;
 			}
-		}
+		}  
 		if (aState->getScreenScrollActive()) {
 			aState->setScreenScroll({ aState->getScreenScrollStart().x - e.motion.x, aState->getScreenScrollStart().y - e.motion.y });
 		}
@@ -235,15 +232,15 @@ int SDL_main(int argc, char* argv[])
 			prevXY.y = boat->getSelfCenter().y;
 		}
 		
-		boatCoordText->drawText(std::string("Boat X:") + std::to_string(boat->getSelfCenter().x) + std::string(" Y:") + std::to_string(boat->getSelfCenter().y));
+		boatCoordText->drawText(string("Boat X:") + to_string(boat->getSelfCenter().x) + string(" Y:") + to_string(boat->getSelfCenter().y));
 		gpsXY boatCoordGPS = gps.pxToGps({boat->getSelfCenter().x, boat->getSelfCenter().y });
 		gps.setGpsMain(boatCoordGPS.y, boatCoordGPS.x);
-		boatCoordGPSText->drawText(std::string("Boat LNG:") + std::to_string(boatCoordGPS.x) + std::string(" LAT:") + std::to_string(boatCoordGPS.y));
-		cursorCoordText->drawText(std::string("Cursor X:") + std::to_string(e.motion.x) + std::string(" Y:") + std::to_string(e.motion.y));
+		boatCoordGPSText->drawText(string("Boat LNG:") + to_string(boatCoordGPS.x) + string(" LAT:") + to_string(boatCoordGPS.y));
+		cursorCoordText->drawText(string("Cursor X:") + to_string(e.motion.x) + string(" Y:") + to_string(e.motion.y));
 		gpsXY cursorCoordGPS = gps.pxToGps({ (e.motion.x + screenScroll.x) , (e.motion.y + screenScroll.y) });
 		gps.setGpsTarget(cursorCoordGPS.y, cursorCoordGPS.x);
-		cursorCoordGPSText->drawText(std::string("Cursor LNG:") + std::to_string(cursorCoordGPS.x) + std::string(" LAT:") + std::to_string(cursorCoordGPS.y));
-		screenScrollText->drawText(std::string("Screen Scroll X:") + std::to_string(screenScroll.x) + std::string(" Y:") + std::to_string(screenScroll.y));
+		cursorCoordGPSText->drawText(string("Cursor LNG:") + to_string(cursorCoordGPS.x) + string(" LAT:") + to_string(cursorCoordGPS.y));
+		screenScrollText->drawText(string("Screen Scroll X:") + to_string(screenScroll.x) + string(" Y:") + to_string(screenScroll.y));
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		string distance = to_string(round(gps.getDistanceBetween2Points() * 100) / 100);
 		gpsDistanceText->drawText("Distance: " + distance.substr(0, distance.length() - 4));
@@ -267,11 +264,11 @@ int SDL_main(int argc, char* argv[])
 		SDL_RenderPresent(renderer);
 		aState->createApp();
 
-		while (true)
+		while (true) // working the net
 		{
 			Address sender;
 			unsigned char buffer[256];
-			int bytes_read = socket.Receive(sender, buffer, sizeof(buffer));
+			int bytes_read = sock.Receive(sender, buffer, sizeof(buffer));
 			if (!bytes_read)
 				break;
 			string sName(reinterpret_cast<char*>(buffer));
@@ -280,9 +277,13 @@ int SDL_main(int argc, char* argv[])
 			cout << to_string(gps.toDegMin(geoCoord.x)) << "," << to_string(gps.toDegMin(geoCoord.y)) << "(" << toPx.x << "," << toPx.y << ")"<< endl;
 			boat->setCoordsOnWindow(toPx.x - boat->getWidthHeight().x / 2, toPx.y - boat->getWidthHeight().y / 2);
 		}
-		/*if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+		
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 			cout << "left" << endl;
-		}*/
+		}
+		sf::Joystick::update();
+		cout << sf::Joystick::getAxisPosition(0, sf::Joystick::X) << " " << sf::Joystick::getAxisPosition(0, sf::Joystick::Y) << endl;
+		cout << sf::Joystick::getAxisPosition(0, sf::Joystick::Z) << " " << sf::Joystick::getAxisPosition(0, sf::Joystick::R) << endl;
 	}
 	return 0;
 }
