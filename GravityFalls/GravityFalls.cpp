@@ -116,6 +116,8 @@ int SDL_main(int argc, char* argv[])
 	ScreenText* screenScrollText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 80);
 	ScreenText* gpsDistanceText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 100);
 	ScreenText* pointCountText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 120);
+	ScreenText* joyLeftText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 140);
+	ScreenText* joyRightText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, 0, 160);
 	ScreenText* sysTimeText = new ScreenText(DEF_FONT_SIZE, { 255, 255, 255 }, renderer, SCREEN_WIDTH - 200, 0);
 	AppState* aState = new AppState(MOVE_SPEED);
 	aState->setScreenScroll({SCREEN_WIDTH / -2, SCREEN_HEIGHT / -2 });
@@ -146,8 +148,12 @@ int SDL_main(int argc, char* argv[])
 	bool run = true;
 	pointXY screenScrollOld;
 	pointXY prevXY = { 0, 0 };
-
+	pointXY joyLeft;
+	pointXY joyRight;
 	while (run) {
+		sf::Joystick::update();
+		joyLeft = { (int)round(sf::Joystick::getAxisPosition(0, sf::Joystick::X)), (int)round(sf::Joystick::getAxisPosition(0, sf::Joystick::Y)) };
+		joyRight = { (int)round(sf::Joystick::getAxisPosition(0, sf::Joystick::R)), (int)round(sf::Joystick::getAxisPosition(0, sf::Joystick::Z)) };
 		pointXY screenScroll = aState->getScreenScroll();
 		while (SDL_PollEvent(&e) != NULL) { // SDL hook buttons
 			if (e.type == SDL_QUIT) {
@@ -244,6 +250,8 @@ int SDL_main(int argc, char* argv[])
 		sysTimeText->drawText("time: " + timer->getWorkTimeText() + " sec, FPS: " + timer->getFps());
 		string distance = to_string(round(gps.getDistanceBetween2Points() * 100) / 100);
 		gpsDistanceText->drawText("Distance: " + distance.substr(0, distance.length() - 4));
+		joyLeftText->drawText("JoyLeft: " + to_string(joyLeft.x) + " " + to_string(joyLeft.y));
+		joyRightText->drawText("JoyRight: " + to_string(joyRight.x) + " " + to_string(joyRight.y));
 		int pointCount = 0;
 		for (vector<pointXY>::iterator It = allPoints.begin(); It < allPoints.end(); It++)
 		{
@@ -281,9 +289,6 @@ int SDL_main(int argc, char* argv[])
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
 			cout << "left" << endl;
 		}
-		sf::Joystick::update();
-		cout << sf::Joystick::getAxisPosition(0, sf::Joystick::X) << " " << sf::Joystick::getAxisPosition(0, sf::Joystick::Y) << endl;
-		cout << sf::Joystick::getAxisPosition(0, sf::Joystick::Z) << " " << sf::Joystick::getAxisPosition(0, sf::Joystick::R) << endl;
 	}
 	return 0;
 }
